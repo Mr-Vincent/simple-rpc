@@ -17,7 +17,7 @@ public class BioServerTest {
 
     @Test
     public void testServer(){
-        BioServer bioServer = new BioServer(21);
+        BioServer bioServer = new BioServer(-1);
         try {
             bioServer.listen();
         } catch (IOException e) {

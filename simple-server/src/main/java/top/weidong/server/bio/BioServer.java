@@ -3,7 +3,7 @@ package top.weidong.server.bio;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import static top.weidong.common.util.Preconditions.*;
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -15,14 +15,22 @@ import java.net.Socket;
  */
 public class BioServer {
 
-
     /** 监听端口*/
     private static final int PORT = 8090;
 
     private ServerSocket ss;
 
+    public BioServer() {
+        try {
+            this.ss = new ServerSocket(PORT);
+        } catch (IOException e) {
+            throw new RuntimeException("服务初始化异常，请检查端口是否被占用");
+        }
+    }
+
     public BioServer(int port) {
-        // check  port is valid or set to default val
+        // check port is valid
+        checkArgument(port>0,"端口号必须大于0");
         try {
             this.ss = new ServerSocket(port);
         } catch (IOException e) {
