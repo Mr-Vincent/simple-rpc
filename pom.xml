@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>top.wei-dong</groupId>
+    <artifactId>simple-rpc</artifactId>
+    <version>0.0.1</version>
+    <modules>
+        <module>simple-common</module>
+        <module>simple-server</module>
+    </modules>
+    <!--为pom不生成target文件夹 为jar则生成target-->
+    <packaging>pom</packaging>
+
+
+    <name>simple-rpc</name>
+    <description>用于学习rpc实现细节的demo</description>
+    <url>https://github.com/xxx</url>
+
+
+
+    <properties>
+        <junit.version>4.12</junit.version>
+        <netty.version>4.1.20.Final</netty.version>
+        <hamcrest.version>1.3</hamcrest.version>
+    </properties>
+
+
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- # netty dependency: begin -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
+                <version>${netty.version}</version>
+                <classifier>linux-x86_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-kqueue</artifactId>
+                <version>${netty.version}</version>
+                <classifier>osx-x86_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-smtp</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- # common test dependency: begin -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- # common test dependency: end -->
+    </dependencies>
+
+    <build>
+
+        <!--
+           往往配置在父项目中 供所有父子项目使用
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <scriptSourceDirectory>${basedir}/src/main/scripts</scriptSourceDirectory>
+        <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+        <outputDirectory>${basedir}/target/classes</outputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
+        -->
+
+        <!--defaultGoal  directory finalName-->
+        <!--三个属性含义：-->
+        <!--执行构建时默认的goal或phase，如jar:jar或者package等-->
+        <!--构建的结果所在的路径，默认为${basedir}/target目录-->
+        <!--构建的最终结果的名字，该名字可能在其他plugin中被改变-->
+        <defaultGoal>install</defaultGoal>
+        <directory>${basedir}/target</directory>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+
+
+        <!--<plugins>给出构建过程中所用到的插件-->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <!--该插件所需要的特殊配置，在父子项目之间可以覆盖或合并-->
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+                <!--executions-->
+                <!--该插件的某个goal（一个插件中可能包含多个goal）的执行方式。一个execution有如下设置：-->
+                <!--id，唯一标识-->
+                <!--goals，要执行的插件的goal（可以有多个），如<goal>run</goal>-->
+                <!--phase，插件的goal要嵌入到Maven的phase中执行，如verify-->
+                <!--inherited，该execution是否可被子项目继承-->
+                <!--configuration，该execution的其他配置参数-->
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <!--executions下的每个execution子元素可以用来配置执行一个任务-->
+                        <!--通过phase配置，将其绑定到verify生命周期阶段，再通过goal配置指定的插件目标-->
+                        <executions>
+                            <execution>
+                                <!--和goal绑定 当生命周期到package这一步了就去执行jar-no-fork-->
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+
+    <developers>
+        <developer>
+            <name>w.dong</name>
+            <email>dongwei2016@gmail.com</email>
+        </developer>
+    </developers>
+
+</project>
