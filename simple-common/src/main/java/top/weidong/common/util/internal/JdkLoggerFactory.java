@@ -1,5 +1,9 @@
 package top.weidong.common.util.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -16,6 +20,13 @@ public class JdkLoggerFactory extends InternalLoggerFactory {
 
     @Override
     protected InternalLogger newInstance(String name) {
-        return new JdkLogger(Logger.getLogger(name));
+        File f = new File(JdkLogger.class.getClass().getResource("/").getPath()+"log.properties");
+        try {
+            System.setProperty("java.util.logging.config.file",f.getCanonicalPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Logger logger = Logger.getLogger(name);
+        return new JdkLogger(logger);
     }
 }

@@ -19,6 +19,7 @@ public class BioServer {
     private static final int PORT = 8090;
 
     private ServerSocket ss;
+    private Socket client;
 
     public BioServer() {
         try {
@@ -38,15 +39,15 @@ public class BioServer {
         }
     }
 
-    public void listen() throws IOException {
-        Socket accept = ss.accept();
-        InputStream inputStream = accept.getInputStream();
-        InputStreamReader isr = new InputStreamReader(inputStream);
-        BufferedReader br = new BufferedReader(isr);
-        String nextLine = null;
-        while ((nextLine = br.readLine()) != null){
-            System.out.println(nextLine);
-        }
+    public void start() throws IOException {
+        client = ss.accept();
+    }
 
+    public void close() throws IOException {
+        client.close();
+    }
+
+    public Socket getClient() {
+        return client;
     }
 }

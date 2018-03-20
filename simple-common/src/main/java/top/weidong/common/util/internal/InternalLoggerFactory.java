@@ -13,6 +13,11 @@ public abstract class InternalLoggerFactory {
     private static volatile InternalLoggerFactory defaultFactory =
             newDefaultFactory(InternalLoggerFactory.class.getName());
 
+    /**
+     * 优先使用slf4j的日志实现 没有实现那就算了 再用jdk的日志实现
+     * @param name
+     * @return
+     */
     private static InternalLoggerFactory newDefaultFactory(String name) {
         InternalLoggerFactory f;
         try {

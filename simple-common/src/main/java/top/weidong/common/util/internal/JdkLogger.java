@@ -3,6 +3,8 @@ package top.weidong.common.util.internal;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -10,6 +12,7 @@ import java.util.logging.Logger;
 /**
  * Created with IntelliJ IDEA.
  * Description:
+ * jdk 原生log实现 默认只输出info级别的 也就是>=800
  *
  * @author dongwei
  * @date 2018/03/13
@@ -22,6 +25,8 @@ public class JdkLogger extends AbstractInternalLogger {
     public JdkLogger(Logger logger) {
         super(logger.getName());
         this.logger = logger;
+
+
     }
 
 
