@@ -10,6 +10,7 @@
     <modules>
         <module>simple-common</module>
         <module>simple-server</module>
+        <module>simple-example</module>
     </modules>
     <!--为pom不生成target文件夹 为jar则生成target-->
     <packaging>pom</packaging>

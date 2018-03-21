@@ -1,7 +1,12 @@
 package top.weidong.common.util.internal;
 
+import top.weidong.common.util.Loader;
+
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,13 +25,18 @@ public class JdkLoggerFactory extends InternalLoggerFactory {
 
     @Override
     protected InternalLogger newInstance(String name) {
-        File f = new File(JdkLogger.class.getClass().getResource("/").getPath()+"log.properties");
-        try {
-            System.setProperty("java.util.logging.config.file",f.getCanonicalPath());
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        // 加载默认的配置文件 没有配置文件就报错
+        URL resource = Loader.getResource("log.properties");
+        if (resource != null) {
+            System.setProperty("java.util.logging.config.file",resource.getPath());
+        } else {
+            throw new RuntimeException("logger配置文件不存在！");
         }
         Logger logger = Logger.getLogger(name);
         return new JdkLogger(logger);
     }
+
+
+
 }

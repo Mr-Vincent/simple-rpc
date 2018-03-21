@@ -30,7 +30,7 @@ public class LoggerTest extends AbsCommonTest{
 //        }
 
         InternalLogger LOGGER = InternalLoggerFactory.getInstance(LoggerTest.class);
-        LOGGER.trace("heheh");
+        LOGGER.debug("heheh");
 
 
     }

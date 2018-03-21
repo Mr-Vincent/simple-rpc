@@ -1,6 +1,6 @@
 package top.weidong.server.bio;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -16,13 +16,12 @@ public class BioClient {
 
     private Socket socket = null;
 
-
     public BioClient(){
         socket = new Socket();
     }
 
-    public void connect(String addr,int port) throws IOException {
-        socket.connect(new InetSocketAddress(addr,port));
+    public void connect(String address,int port) throws IOException {
+        socket.connect(new InetSocketAddress(address,port));
     }
 
     public void close() throws IOException {

@@ -1,8 +1,16 @@
 package top.weidong.server.bio;
 
+import top.weidong.common.util.NamedThreadFactory;
+import top.weidong.server.bio.enums.ProcessorType;
+import top.weidong.server.bio.processor.StringProcessor;
+import top.weidong.server.bio.task.SimpleTask;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.concurrent.*;
+
 import static top.weidong.common.util.Preconditions.*;
 /**
  * Created with IntelliJ IDEA.
@@ -18,8 +26,23 @@ public class BioServer {
     /** 监听端口*/
     private static final int PORT = 8090;
 
+    private final static int WORKER_COUNT = Runtime.getRuntime().availableProcessors();
+
+    private static ExecutorService executor =
+            new ThreadPoolExecutor(WORKER_COUNT,
+                    WORKER_COUNT,
+            0L,
+                    TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(),new NamedThreadFactory("ServerWorkerThreadPool"));
+
+
     private ServerSocket ss;
     private Socket client;
+
+    private ProcessorType processorType;
+
+    private static final HashMap<String, Class> serviceRegistry = new HashMap<String, Class>();
+
 
     public BioServer() {
         try {
@@ -40,14 +63,38 @@ public class BioServer {
     }
 
     public void start() throws IOException {
-        client = ss.accept();
+        while (true){
+            try {
+                client = ss.accept();
+                executor.execute(new SimpleTask(client,processorType,serviceRegistry));
+            } catch (IOException e) {
+                e.printStackTrace();
+                close();
+            }
+        }
     }
+
+    public void setProcessorType(ProcessorType processorType){
+        this.processorType = processorType;
+    }
+
 
     public void close() throws IOException {
         client.close();
     }
 
+    /**
+     * 注册服务 本地保存
+     * @param name
+     * @param clazz
+     */
+    public void regisiter(String name,Class clazz){
+        serviceRegistry.put(name,clazz);
+    }
+
     public Socket getClient() {
         return client;
     }
+
+
 }
