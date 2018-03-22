@@ -1,5 +1,7 @@
 package top.weidong.network.protocal;
 
+import java.io.Serializable;
+
 /**
  * Created with IntelliJ IDEA.
  * Description: response 消息封装
@@ -8,7 +10,7 @@ package top.weidong.network.protocal;
  * @date 2018/03/22
  * Time: 15:12
  */
-public class SResponse {
+public class SResponse implements Serializable{
 
     private String requestId;
     private String error;

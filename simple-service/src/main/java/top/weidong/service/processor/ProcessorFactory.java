@@ -13,19 +13,22 @@ import top.weidong.network.processor.Processor;
  */
 public class ProcessorFactory {
 
-    private ProcessorFactory(){}
+    private ProcessorFactory() {
+    }
 
     /**
-     *
      * 获取实例
+     *
      * @param type
      * @return
      */
-    public static Processor newInstance(ProcessorType type){
+    public static Processor newInstance(ProcessorType type) {
         if (ProcessorType.getDefault().equals(type)) {
             return new DefaultProcessor();
         } else if (ProcessorType.CONSOLE.equals(type)) {
             return new SimpleConsoleProcessor();
+        } else if (ProcessorType.ECHO.equals(type)) {
+            return new EchoProcessor();
         } else {
             throw new RuntimeException("无法识别的类型！");
         }

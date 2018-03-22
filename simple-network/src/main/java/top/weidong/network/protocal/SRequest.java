@@ -1,5 +1,8 @@
 package top.weidong.network.protocal;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 /**
  * Created with IntelliJ IDEA.
  * Description: request 消息封装
@@ -8,7 +11,7 @@ package top.weidong.network.protocal;
  * @date 2018/03/22
  * Time: 15:12
  */
-public class SRequest {
+public class SRequest implements Serializable{
 
     private String requestId;
     private String className;
@@ -54,5 +57,16 @@ public class SRequest {
 
     public void setParameters(Object[] parameters) {
         this.parameters = parameters;
+    }
+
+    @Override
+    public String toString() {
+        return "SRequest{" +
+                "requestId='" + requestId + '\'' +
+                ", className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", parameterTypes=" + Arrays.toString(parameterTypes) +
+                ", parameters=" + Arrays.toString(parameters) +
+                '}';
     }
 }

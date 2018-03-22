@@ -23,7 +23,13 @@ public class DefaultServer {
 
     private SServer server;
 
+    private ProcessorType type;
+
     public DefaultServer(){
+    }
+
+    public DefaultServer(ProcessorType type){
+        this.type = type;
     }
 
     /**
@@ -32,7 +38,12 @@ public class DefaultServer {
      * @return
      */
     public DefaultServer withServer(SServer server){
-        Processor processor = ProcessorFactory.newInstance(ProcessorType.RPC);
+        Processor processor = null;
+        if (null == type) {
+            processor = ProcessorFactory.newInstance(ProcessorType.RPC);
+        } else {
+            processor = ProcessorFactory.newInstance(type);
+        }
         LOGGER.debug("添加处理器：[{}]",processor.getClass().getName());
         if (server.getProcessor() == null) {
             server.withProcessor(processor);

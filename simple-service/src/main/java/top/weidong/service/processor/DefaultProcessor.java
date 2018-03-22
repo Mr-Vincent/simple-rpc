@@ -13,6 +13,7 @@ import top.weidong.service.SimpleContext;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -33,6 +34,9 @@ public class DefaultProcessor extends AbstractProcessor{
      */
     @Override
     public void process(InputStream inputStream, OutputStream outputStream) {
+
+        LOGGER.debug("【{}】开始处理消息=====>>>>>>",System.currentTimeMillis());
+
         Map<String,Class> serviceRegistry = SimpleContext.getServiceRegistry();
         // 获取字节 将其反序列化成对象 先读到tmp中 再将其转化为byte数组
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
@@ -42,6 +46,7 @@ public class DefaultProcessor extends AbstractProcessor{
             while ((length = inputStream.read(buffer)) != -1) {
                 tmp.write(buffer, 0, length);
             }
+            tmp.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

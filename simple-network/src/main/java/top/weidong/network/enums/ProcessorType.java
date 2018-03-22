@@ -10,6 +10,7 @@ package top.weidong.network.enums;
  */
 public enum ProcessorType {
     CONSOLE,
+    ECHO,
     RPC;
 
     public static ProcessorType parse(String name) {

@@ -46,6 +46,7 @@ public class JdkSerializer extends Serializer{
             outputStream.flush();
             return buf.toByteArray();
         } catch (IOException e) {
+            e.printStackTrace();
             ExceptionUtil.throwException(e);
         }finally {
             if (outputStream != null) {
