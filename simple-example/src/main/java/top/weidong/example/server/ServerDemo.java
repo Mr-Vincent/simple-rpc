@@ -2,8 +2,8 @@ package top.weidong.example.server;
 
 import top.weidong.example.ITest;
 import top.weidong.example.impl.TestImpl;
-import top.weidong.server.bio.BioServer;
-import top.weidong.server.bio.enums.ProcessorType;
+import top.weidong.network.SServer;
+import top.weidong.service.DefaultServer;
 
 import java.io.IOException;
 
@@ -18,10 +18,8 @@ import java.io.IOException;
 public class ServerDemo {
 
     public static void main(String[] args) throws IOException {
-        BioServer server = new BioServer(9999);
-        server.regisiter(ITest.class.getName(), TestImpl.class);
-        server.setProcessorType(ProcessorType.RPC);
+        DefaultServer server = new DefaultServer().withServer(new SServer());
+        server.publish(ITest.class.getName(), TestImpl.class);
         server.start();
-
     }
 }

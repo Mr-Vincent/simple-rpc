@@ -1,8 +1,10 @@
 package top.weidong.example.client;
 
+
 import top.weidong.example.ITest;
-import top.weidong.server.bio.BioClient;
-import top.weidong.server.bio.invoker.InvokeProxy;
+import top.weidong.network.SClient;
+import top.weidong.service.DefaultClient;
+import top.weidong.service.invoker.Invoker;
 
 import java.io.IOException;
 
@@ -16,11 +18,10 @@ import java.io.IOException;
  */
 public class ClientDemo {
     public static void main(String[] args) throws IOException {
-        BioClient bioClient = new BioClient();
-        bioClient.connect("localhost",9999);
-        InvokeProxy invokeProxy = new InvokeProxy(bioClient);
-        ITest invoke = invokeProxy.invoke(ITest.class);
-        String hello = invoke.say("hello");
-        System.out.println(hello);
+        DefaultClient client = new DefaultClient().withClient(new SClient().connect("localhost",9999));
+        Invoker invoker = new Invoker(client);
+        ITest invoke = invoker.invoke(ITest.class);
+        System.out.println(invoke.say("hahah"));
+
     }
 }

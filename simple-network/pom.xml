@@ -9,17 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>simple-example</artifactId>
+    <artifactId>simple-network</artifactId>
+    <description>note:网络层实现 不能有业务代码</description>
 
     <dependencies>
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-common</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>top.wei-dong</groupId>
-            <artifactId>simple-service</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>

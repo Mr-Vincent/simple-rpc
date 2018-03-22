@@ -9,18 +9,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>simple-example</artifactId>
+    <artifactId>simple-service</artifactId>
+    <description>服务层：依赖network</description>
 
     <dependencies>
         <dependency>
             <groupId>top.wei-dong</groupId>
-            <artifactId>simple-common</artifactId>
+            <artifactId>simple-network</artifactId>
             <version>0.0.1</version>
         </dependency>
         <dependency>
-            <groupId>top.wei-dong</groupId>
-            <artifactId>simple-service</artifactId>
-            <version>0.0.1</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

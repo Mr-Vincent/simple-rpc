@@ -9,8 +9,9 @@
     <version>0.0.1</version>
     <modules>
         <module>simple-common</module>
-        <module>simple-server</module>
         <module>simple-example</module>
+        <module>simple-network</module>
+        <module>simple-service</module>
     </modules>
     <!--为pom不生成target文件夹 为jar则生成target-->
     <packaging>pom</packaging>
