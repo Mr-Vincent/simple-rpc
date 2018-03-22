@@ -1,16 +1,13 @@
 package top.weidong.network.task;
 
 import top.weidong.common.util.Preconditions;
-import top.weidong.common.util.internal.InternalLogger;
-import top.weidong.common.util.internal.InternalLoggerFactory;
-import top.weidong.network.enums.ProcessorType;
+import top.weidong.common.util.internal.logging.InternalLogger;
+import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 import top.weidong.network.processor.Processor;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.

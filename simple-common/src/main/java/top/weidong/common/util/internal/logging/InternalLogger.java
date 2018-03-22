@@ -1,4 +1,4 @@
-package top.weidong.common.util.internal;
+package top.weidong.common.util.internal.logging;
 
 /**
  * Created with IntelliJ IDEA.

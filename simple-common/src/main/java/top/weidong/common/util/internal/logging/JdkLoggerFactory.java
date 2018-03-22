@@ -1,14 +1,8 @@
-package top.weidong.common.util.internal;
+package top.weidong.common.util.internal.logging;
 
 import top.weidong.common.util.Loader;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

@@ -1,4 +1,4 @@
-package top.weidong.common.util.internal;
+package top.weidong.common.util.internal.logging;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLoggerFactory;

@@ -30,7 +30,7 @@
  * under the License.
  */
 
-package top.weidong.common.util.internal;
+package top.weidong.common.util.internal.logging;
 
 import java.text.MessageFormat;
 import java.util.HashSet;

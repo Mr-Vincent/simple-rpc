@@ -30,7 +30,7 @@
  * under the License.
  */
 
-package top.weidong.common.util.internal;
+package top.weidong.common.util.internal.logging;
 
 /**
  * Holds the results of formatting done by {@link MessageFormatter}.

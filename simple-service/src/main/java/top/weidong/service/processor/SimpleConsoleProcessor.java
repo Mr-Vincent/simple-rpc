@@ -1,7 +1,7 @@
 package top.weidong.service.processor;
 
-import top.weidong.common.util.internal.InternalLogger;
-import top.weidong.common.util.internal.InternalLoggerFactory;
+import top.weidong.common.util.internal.logging.InternalLogger;
+import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 
 import java.io.*;
 

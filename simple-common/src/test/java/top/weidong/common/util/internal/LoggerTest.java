@@ -1,10 +1,9 @@
 package top.weidong.common.util.internal;
 
-import org.junit.Test;
+import top.weidong.common.util.internal.logging.InternalLogger;
+import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
