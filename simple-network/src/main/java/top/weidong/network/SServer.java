@@ -42,9 +42,6 @@ public class SServer {
     private ServerSocket ss;
     private Socket client;
 
-    /** 处理器类型*/
-//    private ProcessorType processorType;
-
     /** 处理器*/
     private Processor processor;
 
@@ -82,7 +79,6 @@ public class SServer {
     public void close() throws IOException {
         client.close();
     }
-
 
     public Socket getClient() {
         return client;

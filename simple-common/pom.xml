@@ -26,6 +26,20 @@
         </dependency>
 
 
+        <!-- ### benchmark: begin -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <!-- ### benchmark dependency: end -->
+
+
     </dependencies>
 
 

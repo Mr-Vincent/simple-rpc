@@ -1,7 +1,6 @@
 package top.weidong.service.invoker;
 
 import top.weidong.common.util.Preconditions;
-import top.weidong.network.SClient;
 import top.weidong.service.DefaultClient;
 import top.weidong.service.proxy.SimpleProxy;
 
@@ -15,6 +14,8 @@ import java.net.Socket;
 /**
  * Created with IntelliJ IDEA.
  * Description: 代理调用器--很直接的翻译😄
+ * 暴露太多细节 不够抽象 对以后的拓展很不方便
+ * i/o流的细节应该抽象出来
  *
  * @author dongwei
  * @date 2018/03/21
