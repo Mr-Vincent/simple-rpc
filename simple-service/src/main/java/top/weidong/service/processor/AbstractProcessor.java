@@ -5,6 +5,7 @@ import top.weidong.network.processor.Processor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,5 +17,8 @@ import java.io.OutputStream;
  */
 public abstract class AbstractProcessor implements Processor{
 
+    @Override
+    public void process(Socket client) {
 
+    }
 }

@@ -2,6 +2,7 @@ package top.weidong.network.processor;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,4 +21,10 @@ public interface Processor {
      * @param outputStream
      */
     void process(InputStream inputStream, OutputStream outputStream);
+
+    /**
+     * 重载
+     * @param client
+     */
+    void process(Socket client);
 }

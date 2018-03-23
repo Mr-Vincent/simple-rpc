@@ -17,6 +17,11 @@
             <artifactId>simple-service</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>top.wei-dong</groupId>
+            <artifactId>simple-example</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
 
