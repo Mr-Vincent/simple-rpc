@@ -1,5 +1,6 @@
 package top.weidong.service.processor;
 
+import top.weidong.common.util.IoUtil;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 
@@ -28,7 +29,7 @@ public class SimpleConsoleProcessor extends AbstractProcessor{
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            close(inputStream,outputStream);
+            IoUtil.close(inputStream,outputStream);
         }
     }
 }

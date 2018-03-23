@@ -16,7 +16,7 @@ public class ExceptionUtil {
      * Raises an exception bypassing compiler checks for checked exceptions.
      */
     public static void throwException(Throwable t) {
-        Unsafe unsafe = JUnsafe.getUnsafe();
+        Unsafe unsafe = top.weidong.common.util.JUnsafe.getUnsafe();
         if (unsafe != null) {
             unsafe.throwException(t);
         } else {

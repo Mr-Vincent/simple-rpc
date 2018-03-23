@@ -16,25 +16,5 @@ import java.io.OutputStream;
  */
 public abstract class AbstractProcessor implements Processor{
 
-    /**
-     * 关闭流操作
-     * @param input
-     * @param output
-     */
-    protected void close(InputStream input, OutputStream output){
-        if (output != null) {
-            try {
-                output.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (input != null) {
-            try {
-                input.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 }

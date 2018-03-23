@@ -1,6 +1,7 @@
 package top.weidong.service.processor;
 
 import top.weidong.common.util.ExceptionUtil;
+import top.weidong.common.util.IoUtil;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 import top.weidong.network.protocal.SRequest;
@@ -28,7 +29,7 @@ public class DefaultProcessor extends AbstractProcessor{
 
     private final static InternalLogger LOGGER = InternalLoggerFactory.getInstance(DefaultServer.class);
     /**
-     * 处理流
+     * 处理流  流的关闭一定要掌握好时机 不然一不小心就会报socket close异常
      * @param inputStream
      * @param outputStream
      */
@@ -39,19 +40,12 @@ public class DefaultProcessor extends AbstractProcessor{
 
         Map<String,Class> serviceRegistry = SimpleContext.getServiceRegistry();
         // 获取字节 将其反序列化成对象 先读到tmp中 再将其转化为byte数组
-        ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
+        byte[] result = null;
         try {
-            while ((length = inputStream.read(buffer)) != -1) {
-                tmp.write(buffer, 0, length);
-            }
-            tmp.flush();
+            result = IoUtil.readToBytes(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            ExceptionUtil.throwException(e);
         }
-        byte[] result = tmp.toByteArray();
-
         LOGGER.debug("收到客户端的请求消息序列化完成，总字节长度为：[{}]字节",result.length);
 
         Serializer jdkSerializer = SerializationFactory.getDefaultSerializer();
@@ -78,12 +72,11 @@ public class DefaultProcessor extends AbstractProcessor{
             LOGGER.debug("消息处理结束，响应消息序列化完成，总字节长度为：[{}]",writeObject.length);
             // 最后将其输出
             outputStream.write(writeObject);
-
         } catch (Exception e) {
             response.setError(e.getLocalizedMessage());
             ExceptionUtil.throwException(e);
         } finally {
-            close(inputStream,outputStream);
+            IoUtil.close(inputStream,outputStream);
         }
 
     }
