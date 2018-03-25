@@ -38,7 +38,10 @@ public class SimpleTask implements Runnable {
             InetSocketAddress remoteSocketAddress = (InetSocketAddress) client.getRemoteSocketAddress();
             remoteClient = remoteSocketAddress.getHostName() +":"+ remoteSocketAddress.getPort();
             LOGGER.debug("远程客户端：[{}]",remoteClient);
-            processor.process(client.getInputStream(), client.getOutputStream());
+            boolean flag = true;
+            while (flag){
+                flag = processor.process(client.getInputStream(), client.getOutputStream());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

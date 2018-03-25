@@ -18,7 +18,7 @@ public class SimpleConsoleProcessor extends AbstractProcessor{
     private static  final InternalLogger LOGGER = InternalLoggerFactory.getInstance(SimpleConsoleProcessor.class);
 
     @Override
-    public void process(InputStream inputStream, OutputStream outputStream) {
+    public boolean process(InputStream inputStream, OutputStream outputStream) {
         InputStreamReader reader = new InputStreamReader(inputStream);
         BufferedReader bufferedReader = new BufferedReader(reader);
         String line = null;
@@ -31,5 +31,6 @@ public class SimpleConsoleProcessor extends AbstractProcessor{
         } finally {
             IoUtil.close(inputStream,outputStream);
         }
+        return true;
     }
 }

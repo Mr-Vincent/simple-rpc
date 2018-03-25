@@ -48,11 +48,19 @@ public class Invoker {
      */
     static class TransferHandler implements InvocationHandler{
         DefaultClient client;
+        Socket socket = null;
         TransferHandler(DefaultClient client){
             this.client = client;
+            socket = client.getSocket();
+        }
+        private Socket getSocket(){
+            if (socket == null) {
+                socket = client.getSocket();
+            }
+            return socket;
         }
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public synchronized Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             // 将消息封装成对象
             SRequest request = new SRequest();
             request.setRequestId(UUID.randomUUID().toString());
@@ -63,24 +71,24 @@ public class Invoker {
 
             Serializer jdkSerializer = SerializationFactory.getDefaultSerializer();
             byte[] bytes = jdkSerializer.writeObject(request);
-            Socket socket = client.getSocket();
+            Socket socket = getSocket();
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
-
+            int writeLength = bytes.length;
+            // write只能写byte 将int拆为4个byte顺序写 服务端顺序接收再拼接成int即可
+            IoUtil.writeLength(outputStream,writeLength);
             // 将字节写出去
             outputStream.write(bytes);
+            // 写结束标记
             LOGGER.debug("[{}]个字节待写出",bytes.length);
-            // 不能再等着流可读，会一直阻塞住线程
-            // 先将out关掉 这样就能将字节写出了
-            // 流不能关，关了socket也同时关了 后面就不能用了
-            socket.shutdownOutput();
             byte[] result = null;
             try {
-                result = IoUtil.readToBytes(inputStream);
+                int readLength = IoUtil.readLength(inputStream);
+                result = IoUtil.readToBytes0(inputStream,readLength);
             } catch (IOException e) {
                 ExceptionUtil.throwException(e);
             }finally {
-                IoUtil.close(socket,inputStream,outputStream);
+                //IoUtil.close(socket,inputStream,outputStream);
             }
             LOGGER.debug("收到服务端的响应消息序列化完成，总字节长度为：[{}]字节",result.length);
             SResponse response = jdkSerializer.readObject(result, SResponse.class);

@@ -11,6 +11,7 @@ import top.weidong.serializer.Serializer;
 import top.weidong.service.DefaultServer;
 import top.weidong.service.SimpleContext;
 
+import javax.sound.midi.SoundbankResource;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ public class DefaultProcessor extends AbstractProcessor{
      * @param outputStream
      */
     @Override
-    public void process(InputStream inputStream, OutputStream outputStream) {
+    public synchronized boolean  process(InputStream inputStream, OutputStream outputStream) {
 
         LOGGER.debug("【{}】开始处理消息=====>>>>>>",System.currentTimeMillis());
 
@@ -42,7 +43,14 @@ public class DefaultProcessor extends AbstractProcessor{
         // 获取字节 将其反序列化成对象 先读到tmp中 再将其转化为byte数组
         byte[] result = null;
         try {
-            result = IoUtil.readToBytes(inputStream);
+            // 客户端多写了4字节作为消息长度 这里多读4个字节
+            int readLength = IoUtil.readLength(inputStream);
+            LOGGER.debug("【{}】本次需要读字节数[{}]=====>>>>>>",System.currentTimeMillis(),readLength);
+            LOGGER.debug("【{}】准备读取字节=====>>>>>>",System.currentTimeMillis());
+            result = IoUtil.readToBytes0(inputStream,readLength);
+            if (result.length <=0 ){
+                return false;
+            }
         } catch (IOException e) {
             ExceptionUtil.throwException(e);
         }
@@ -71,13 +79,15 @@ public class DefaultProcessor extends AbstractProcessor{
             byte[] writeObject = jdkSerializer.writeObject(response);
             LOGGER.debug("消息处理结束，响应消息序列化完成，总字节长度为：[{}]",writeObject.length);
             // 最后将其输出
+            IoUtil.writeLength(outputStream,writeObject.length);
             outputStream.write(writeObject);
         } catch (Exception e) {
             response.setError(e.getLocalizedMessage());
             ExceptionUtil.throwException(e);
         } finally {
-            IoUtil.close(inputStream,outputStream);
+            //IoUtil.close(inputStream,outputStream);
         }
+        return true;
 
     }
 }

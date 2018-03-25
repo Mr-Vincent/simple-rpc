@@ -18,7 +18,7 @@ public class EchoProcessor extends AbstractProcessor{
     private static  final InternalLogger LOGGER = InternalLoggerFactory.getInstance(EchoProcessor.class);
 
     @Override
-    public void process(InputStream inputStream, OutputStream outputStream) {
+    public boolean process(InputStream inputStream, OutputStream outputStream) {
 
         InputStreamReader reader = new InputStreamReader(inputStream);
         BufferedReader bufferedReader = new BufferedReader(reader);
@@ -36,5 +36,6 @@ public class EchoProcessor extends AbstractProcessor{
         } finally {
             IoUtil.close(inputStream,outputStream);
         }
+        return true;
     }
 }

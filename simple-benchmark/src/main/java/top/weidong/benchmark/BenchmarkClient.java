@@ -27,13 +27,14 @@ public class BenchmarkClient {
         Invoker invoker = new Invoker(client);
         final ITest invoke = invoker.invoke(ITest.class);
 
+//
+//        for (int i = 0; i < 1000; i++) {
+//            String str = invoke.say("Vincent");
+//            System.out.println(str);
+//            System.out.println(i);
+//        }
 
-        for (int i = 0; i < 5000; i++) {
-            String str = invoke.say("Vincent");
-            System.out.println(str);
-        }
-
-        final int t = 10000;
+        final int t = 1000;
         final int step = 6;
         final int processors = Runtime.getRuntime().availableProcessors();
         long start = System.currentTimeMillis();

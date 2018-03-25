@@ -20,7 +20,7 @@ public interface Processor {
      * @param inputStream
      * @param outputStream
      */
-    void process(InputStream inputStream, OutputStream outputStream);
+    boolean process(InputStream inputStream, OutputStream outputStream);
 
     /**
      * 重载
