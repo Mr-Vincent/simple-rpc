@@ -69,13 +69,12 @@ public abstract class IoUtil {
      */
     public static byte[] readToBytes0(InputStream inputStream, int length) throws IOException {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-        int counter = 0;
-        int b;
+        int readBytes = 0;
+        byte[] buffer = new byte[512];
         try {
-            while (counter < length) {
-                b = inputStream.read();
-                tmp.write(b);
-                counter++;
+            while (readBytes < length) {
+                readBytes = inputStream.read(buffer);
+                tmp.write(buffer);
             }
             tmp.flush();
         } finally {
