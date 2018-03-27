@@ -1,2 +1,3 @@
 top.weidong.serializer.jdk.JdkSerializer
 top.weidong.serializer.protostuff.ProtoStuffSerializer
+top.weidong.serializer.kryo.KryoSerializer

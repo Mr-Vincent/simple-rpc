@@ -40,7 +40,7 @@ public class SerializationFactory {
      * @return
      */
     public static Serializer getDefaultSerializer() {
-        return serializers.get(SerializerType.PROTO_STUFF.value());
+        return serializers.get(SerializerType.KRYO.value());
     }
 
     /**

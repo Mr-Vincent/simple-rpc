@@ -30,6 +30,7 @@ public class SerializerBenchmarkTest {
 
     private static Serializer proto = SerializationFactory.create(SerializerType.PROTO_STUFF);
     private static Serializer jdk = SerializationFactory.create(SerializerType.JAVA);
+    private static Serializer kyro = SerializationFactory.create(SerializerType.KRYO);
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder()
                 .include(SerializerBenchmarkTest.class.getSimpleName())
@@ -53,6 +54,15 @@ public class SerializerBenchmarkTest {
             Person person = new Person("dongwei",25);
             byte[] bytes = jdk.writeObject(person);
             Person readObject = jdk.readObject(bytes, Person.class);
+        }
+    }
+
+    @Benchmark
+    public void testKryo() {
+        for (int i=0;i<10;i++){
+            Person person = new Person("dongwei",25);
+            byte[] bytes = kyro.writeObject(person);
+            Person readObject = kyro.readObject(bytes, Person.class);
         }
     }
 
