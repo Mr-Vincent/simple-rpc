@@ -8,10 +8,14 @@
 ### 性能
 同步调用
 
- **Request count: 256000, time: 506 second, qps: 505**
+ ~~Request count: 256000, time: 506 second, qps: 505~~
+ 
+ **(最新数据)Request count: 256000, time: 177 second, qps: 1446**
+ 本屌将同步方式改为炫酷的AQS实现，放弃使用sync关键字（原因在于sync是基于字节码，在jvm指令层实现的同步，开销很大，而AQS基于语义实现的同步）性能提升了3倍，优化效果很棒！
  
  这个数据在本机上跑出来的，实际情况可能比这个数据更糟。
 
 异步调用
+
  还没实现异步
  
