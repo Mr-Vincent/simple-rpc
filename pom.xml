@@ -14,6 +14,7 @@
         <module>simple-service</module>
         <module>simple-benchmark</module>
         <module>simple-serializer</module>
+        <module>simple-registry</module>
     </modules>
     <!--为pom不生成target文件夹 为jar则生成target-->
     <packaging>pom</packaging>
@@ -35,7 +36,7 @@
         <protostuff.version>1.5.2</protostuff.version>
         <kryo.version>2.23.0</kryo.version>
         <objenesis.version>2.1</objenesis.version>
-
+        <zookeeper.version>3.4.8</zookeeper.version>
     </properties>
 
 
@@ -118,6 +119,13 @@
                 <groupId>org.objenesis</groupId>
                 <artifactId>objenesis</artifactId>
                 <version>${objenesis.version}</version>
+            </dependency>
+
+            <!-- ZooKeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
