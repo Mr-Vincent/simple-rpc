@@ -1,0 +1,2 @@
+top.weidong.serializer.jdk.JdkSerializer
+top.weidong.serializer.protostuff.ProtoStuffSerializer

@@ -16,24 +16,12 @@ public class FutureTest {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-        final Thread mainThread = Thread.currentThread();
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    System.in.read();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                LockSupport.unpark(mainThread);
-            }
-        }).start();
-        LockSupport.park();
-        System.out.println("======");
         ExecutorService executorService = Executors.newCachedThreadPool();
-        Future<Integer> future = executorService.submit(new MyCallable());
-        System.out.println(future.get());
+//        Future<Integer> future = executorService.submit(new MyCallable());
+
+        Future<?> submit = executorService.submit(new MyRunnable());
+        System.out.println("哈哈哈 我可以继续执行");
+//        System.out.println(future.get());
         executorService.shutdown();
 
 
@@ -43,8 +31,21 @@ public class FutureTest {
 
         @Override
         public Integer call() throws Exception {
-            Thread.sleep(100000L);
+            Thread.sleep(10000L);
             return 10;
+        }
+    }
+
+    static class MyRunnable implements Runnable{
+        @Override
+        public void run() {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+                System.out.println("runnable");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

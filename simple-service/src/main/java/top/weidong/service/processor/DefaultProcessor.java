@@ -26,35 +26,36 @@ import java.util.Map;
  * @date 2018/03/22
  * Time: 10:42
  */
-public class DefaultProcessor extends AbstractProcessor{
+public class DefaultProcessor extends AbstractProcessor {
 
     private final static InternalLogger LOGGER = InternalLoggerFactory.getInstance(DefaultServer.class);
+
     /**
      * 处理流  流的关闭一定要掌握好时机 不然一不小心就会报socket close异常
+     *
      * @param inputStream
      * @param outputStream
      */
     @Override
-    public synchronized boolean  process(InputStream inputStream, OutputStream outputStream) {
+    public synchronized boolean process(InputStream inputStream, OutputStream outputStream) {
 
-        LOGGER.debug("【{}】开始处理消息=====>>>>>>",System.currentTimeMillis());
+        LOGGER.debug("【{}】开始处理消息=====>>>>>>", System.currentTimeMillis());
 
-        Map<String,Class> serviceRegistry = SimpleContext.getServiceRegistry();
-        // 获取字节 将其反序列化成对象 先读到tmp中 再将其转化为byte数组
+        Map<String, Class> serviceRegistry = SimpleContext.getServiceRegistry();
         byte[] result = null;
         try {
             // 客户端多写了4字节作为消息长度 这里多读4个字节
             int readLength = IoUtil.readLength(inputStream);
-            LOGGER.debug("【{}】本次需要读字节数[{}]=====>>>>>>",System.currentTimeMillis(),readLength);
-            LOGGER.debug("【{}】准备读取字节=====>>>>>>",System.currentTimeMillis());
-            result = IoUtil.readToBytes0(inputStream,readLength);
-            if (result.length <=0 ){
+            if (readLength <= 0) {
                 return false;
             }
+            LOGGER.debug("【{}】本次需要读字节数[{}]个=====>>>>>>", System.currentTimeMillis(), readLength);
+            LOGGER.debug("【{}】准备读取字节=====>>>>>>", System.currentTimeMillis());
+            result = IoUtil.readToBytes0(inputStream, readLength);
+            LOGGER.debug("收到客户端的请求消息序列化完成，总字节长度为：[{}]个字节", result.length);
         } catch (IOException e) {
             ExceptionUtil.throwException(e);
         }
-        LOGGER.debug("收到客户端的请求消息序列化完成，总字节长度为：[{}]字节",result.length);
 
         Serializer jdkSerializer = SerializationFactory.getDefaultSerializer();
         SRequest sRequest = jdkSerializer.readObject(result, SRequest.class);
@@ -72,14 +73,14 @@ public class DefaultProcessor extends AbstractProcessor{
             }
             Method method = serviceClass.getMethod(methodName, parameterTypes);
             Object resultObj = method.invoke(serviceClass.newInstance(), arguments);
-            LOGGER.debug("响应结果为：[{}]",resultObj);
+            LOGGER.debug("响应结果为：[{}]", resultObj);
             // 与请求消息id对应
             response.setRequestId(requestId);
             response.setResult(resultObj);
             byte[] writeObject = jdkSerializer.writeObject(response);
-            LOGGER.debug("消息处理结束，响应消息序列化完成，总字节长度为：[{}]",writeObject.length);
+            LOGGER.debug("消息处理结束，响应消息序列化完成，总字节长度为：[{}]", writeObject.length);
             // 最后将其输出
-            IoUtil.writeLength(outputStream,writeObject.length);
+            IoUtil.writeLength(outputStream, writeObject.length);
             outputStream.write(writeObject);
         } catch (Exception e) {
             response.setError(e.getLocalizedMessage());

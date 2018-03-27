@@ -1,6 +1,13 @@
 package top.weidong.serializer;
 
+import top.weidong.common.util.Maps;
+import top.weidong.common.util.internal.logging.InternalLogger;
+import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 import top.weidong.serializer.enums.SerializerType;
+import top.weidong.serializer.jdk.JdkSerializer;
+
+import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,41 +19,42 @@ import top.weidong.serializer.enums.SerializerType;
  */
 public class SerializationFactory {
 
-    private final static byte PROTO_STUFF = ((byte) 0x01);
-    private final static byte HESSIAN = ((byte) 0x02);
-    private final static byte KRYO = ((byte) 0x03);
-    private final static byte JAVA = ((byte) 0x04);
+    private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(SerializationFactory.class);
+
+    private static final Map<Byte, Serializer> serializers = Maps.newConcurrentMap();
+
+    static {
+        Iterable<Serializer> all = ServiceLoader.load(Serializer.class);
+        for (Serializer s : all) {
+            serializers.put(s.code(), s);
+        }
+        LOGGER.info("Supported serializers: {}.", serializers);
+    }
 
     private SerializationFactory() {
     }
 
     /**
-     * 获取默认产品 实际上也只有一个产品😄
+     * 获取默认产品
+     *
      * @return
      */
     public static Serializer getDefaultSerializer() {
-        return new JdkSerializer();
+        return serializers.get(SerializerType.PROTO_STUFF.value());
     }
 
     /**
      * 生产一个对象
+     *
      * @param type
      * @return
      */
-    public static Serializer creator(SerializerType type) {
-        int code = type.value();
-        switch (code) {
-            case JAVA:
-                return new JdkSerializer();
-            case KRYO:
-                return null;
-            case HESSIAN:
-                return null;
-            case PROTO_STUFF:
-                return null;
-            default:
-                return new JdkSerializer();
+    public static Serializer create(SerializerType type) {
+        Serializer serializer = serializers.get(type.value());
+        if (serializer == null) {
+            throw new IllegalArgumentException("unsupported serializer type with code: " + type.name());
         }
-
+        return serializer;
     }
+
 }

@@ -87,7 +87,7 @@ public class Invoker {
                 // 将字节写出去
                 outputStream.write(bytes);
                 // 写结束标记
-                LOGGER.debug("[{}]个字节待写出",bytes.length);
+                LOGGER.debug("[{}]个字节待写出",writeLength);
                 byte[] result = null;
                 try {
                     int readLength = IoUtil.readLength(inputStream);

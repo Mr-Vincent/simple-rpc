@@ -70,7 +70,7 @@ public abstract class IoUtil {
     public static byte[] readToBytes0(InputStream inputStream, int length) throws IOException {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         int readBytes = 0;
-        byte[] buffer = new byte[512];
+        byte[] buffer = new byte[length];
         try {
             while (readBytes < length) {
                 readBytes = inputStream.read(buffer);

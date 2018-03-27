@@ -1,6 +1,7 @@
-package top.weidong.serializer;
+package top.weidong.serializer.jdk;
 
 import top.weidong.common.util.ExceptionUtil;
+import top.weidong.serializer.Serializer;
 import top.weidong.serializer.enums.SerializerType;
 
 import java.io.*;
@@ -14,7 +15,7 @@ import java.io.*;
  * @date 2018/03/22
  * Time: 16:08
  */
-public class JdkSerializer extends Serializer{
+public class JdkSerializer extends Serializer {
 
     /** 目的是复用 ByteArrayOutputStream 中的 byte[]*/
     private static final ThreadLocal<ByteArrayOutputStream> bufThreadLocal = new ThreadLocal<ByteArrayOutputStream>() {
