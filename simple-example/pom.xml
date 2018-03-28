@@ -22,6 +22,11 @@
             <artifactId>simple-service</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<artifactId>junit</artifactId>-->
+            <!--<version>4.12</version>-->
+            <!--<groupId>junit</groupId>-->
+        <!--</dependency>-->
     </dependencies>
 
 

@@ -37,6 +37,8 @@
         <kryo.version>2.23.0</kryo.version>
         <objenesis.version>2.1</objenesis.version>
         <zookeeper.version>3.4.8</zookeeper.version>
+        <javaassit.version>3.20.0-GA</javaassit.version>
+        <cglib.version>3.1</cglib.version>
     </properties>
 
 
@@ -127,6 +129,22 @@
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javaassit.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
