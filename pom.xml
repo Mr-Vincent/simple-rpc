@@ -37,6 +37,7 @@
         <kryo.version>2.23.0</kryo.version>
         <objenesis.version>2.1</objenesis.version>
         <zookeeper.version>3.4.8</zookeeper.version>
+        <curator.version>2.9.1</curator.version>
         <javaassit.version>3.20.0-GA</javaassit.version>
         <cglib.version>3.2.2</cglib.version>
         <bytebuddy.version>1.6.3</bytebuddy.version>
@@ -129,6 +130,23 @@
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
+            </dependency>
+            <!--zk client-->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
