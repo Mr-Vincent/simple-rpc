@@ -1,15 +1,14 @@
 package top.weidong.benchmark;
 
 import javassist.util.proxy.MethodHandler;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import top.weidong.example.ITest;
-import top.weidong.example.impl.TestImpl;
 import top.weidong.service.proxy.Proxies;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,58 +18,89 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created with IntelliJ IDEA.
  * Description: 代理基准性能测试
+ * 带业务处理：性能差距不大
+ * Benchmark                                       Mode  Cnt  Score   Error   Units
+ * ProxyBenchmarkTest.genericASSITInvokeTest      thrpt   10  2.830 ± 0.315  ops/us
+ * ProxyBenchmarkTest.genericBYTEBUDDYInvokeTest  thrpt   10  3.038 ± 0.074  ops/us
+ * ProxyBenchmarkTest.genericJDKInvokeTest        thrpt   10  3.062 ± 0.053  ops/us
+ *
+ * 不带业务处理：bytebuddy性能比其他都高出一倍左右
+ * Benchmark                                       Mode  Cnt     Score    Error   Units
+ * ProxyBenchmarkTest.genericASSITInvokeTest      thrpt   10   509.003 ± 11.863  ops/us
+ * ProxyBenchmarkTest.genericBYTEBUDDYInvokeTest  thrpt   10  1118.753 ± 24.387  ops/us
+ * ProxyBenchmarkTest.genericJDKInvokeTest        thrpt   10   743.625 ± 22.115  ops/us
+ *
  *
  * @author dongwei
  * @date 2018/03/28
  * Time: 19:09
  */
-
+@Fork(1)
+@Warmup(iterations = 5)
+@Measurement(iterations = 10)
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3)
-@Measurement(iterations = 10, time = 5, timeUnit = TimeUnit.SECONDS)
-@Threads(8)
-@OutputTimeUnit(TimeUnit.SECONDS)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ProxyBenchmarkTest {
 
     public static void main(String[] args) throws RunnerException {
-        Options options = new OptionsBuilder()
+        Options opt = new OptionsBuilder()
                 .include(ProxyBenchmarkTest.class.getSimpleName())
-                .forks(1).build();
-        new Runner(options).run();
+                .build();
+        new Runner(opt).run();
+    }
+
+    static TestInterface testImpl = new TestImlp();
+
+    static class ByteBuddyProxyHandler {
+
+        @SuppressWarnings("UnusedParameters")
+        @RuntimeType
+        public Object invoke(@Origin Method method, @AllArguments @RuntimeType Object[] args) throws Throwable {
+            return method.invoke(testImpl,args);
+        }
+    }
+
+    static TestInterface assitTest = Proxies.ASSIT.newProxy(TestInterface.class, new MethodHandler() {
+        @Override
+        public Object invoke(Object self, Method method, Method proceed, Object[] args) throws Throwable {
+            return method.invoke(testImpl,args);
+        }
+    });
+
+    static TestInterface jdkTest = Proxies.JDK_PROXY.newProxy(TestInterface.class, new InvocationHandler() {
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(testImpl,args);
+        }
+    });
+
+    static TestInterface byteBuddyTest = Proxies.BYTE_BUDDY_PROXY.newProxy(TestInterface.class,  new ByteBuddyProxyHandler());
+
+    @Benchmark
+    public static void genericASSITInvokeTest(){
+        assitTest.say("11111");
     }
 
 
     @Benchmark
-    public void genericASSITInvokeTest(){
-        ITest test = Proxies.ASSIT.newProxy(ITest.class, new MethodHandler() {
-            @Override
-            public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
-                return thisMethod.invoke(new TestImpl(), args);
-            }
-        });
-        test.say("11111");
+    public static void genericJDKInvokeTest(){
+        jdkTest.say("11111");
     }
 
 
     @Benchmark
-    public void genericJDKInvokeTest(){
-        ITest test = Proxies.JDK_PROXY.newProxy(ITest.class, new InvocationHandler() {
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return method.invoke(new TestImpl(), args);
-            }
-        });
-        test.say("11111");
+    public static void genericBYTEBUDDYInvokeTest(){
+        byteBuddyTest.say("11111");
     }
+}
 
-    @Benchmark
-    public void genericCGLIBInvokeTest(){
-        ITest test = Proxies.CGLIB.newProxy(ITest.class, new MethodInterceptor() {
-            @Override
-            public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-                return method.invoke(new TestImpl(),objects);
-            }
-        });
-        test.say("11111");
+interface TestInterface {
+    String say(String arg);
+}
+
+class TestImlp implements TestInterface{
+    @Override
+    public String say(String arg) {
+        return "haha" +arg;
     }
 }

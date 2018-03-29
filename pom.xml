@@ -38,7 +38,8 @@
         <objenesis.version>2.1</objenesis.version>
         <zookeeper.version>3.4.8</zookeeper.version>
         <javaassit.version>3.20.0-GA</javaassit.version>
-        <cglib.version>3.1</cglib.version>
+        <cglib.version>3.2.2</cglib.version>
+        <bytebuddy.version>1.6.3</bytebuddy.version>
     </properties>
 
 
@@ -140,8 +141,14 @@
             <!-- https://mvnrepository.com/artifact/cglib/cglib -->
             <dependency>
                 <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
+                <artifactId>cglib-nodep</artifactId>
                 <version>${cglib.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
             </dependency>
 
 

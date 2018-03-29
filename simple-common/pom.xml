@@ -26,6 +26,13 @@
         </dependency>
 
 
+        <!--反射工具-->
+        <dependency>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
+        </dependency>
+
+
         <!-- ### benchmark: begin -->
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
@@ -39,14 +46,21 @@
         </dependency>
         <!-- ### benchmark dependency: end -->
 
+        <!--proxy libs-->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
+            <artifactId>cglib-nodep</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+        </dependency>
+
 
     </dependencies>
 
