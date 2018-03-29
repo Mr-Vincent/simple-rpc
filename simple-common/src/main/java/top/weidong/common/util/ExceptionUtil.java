@@ -1,6 +1,7 @@
 package top.weidong.common.util;
 
 import sun.misc.Unsafe;
+import top.weidong.common.util.internal.JUnsafe;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +17,7 @@ public class ExceptionUtil {
      * Raises an exception bypassing compiler checks for checked exceptions.
      */
     public static void throwException(Throwable t) {
-        Unsafe unsafe = top.weidong.common.util.JUnsafe.getUnsafe();
+        Unsafe unsafe = JUnsafe.getUnsafe();
         if (unsafe != null) {
             unsafe.throwException(t);
         } else {

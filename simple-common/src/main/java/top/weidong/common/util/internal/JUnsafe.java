@@ -1,3 +1,4 @@
+package top.weidong.common.util.internal;
 /*
  * Copyright (c) 2015 The Jupiter Project
  *
@@ -14,7 +15,6 @@
  * limitations under the License.
  */
 
-package top.weidong.common.util;
 
 import sun.misc.Unsafe;
 import top.weidong.common.util.internal.logging.InternalLogger;

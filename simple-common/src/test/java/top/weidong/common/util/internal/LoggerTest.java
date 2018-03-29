@@ -1,9 +1,12 @@
 package top.weidong.common.util.internal;
 
+import top.weidong.common.util.Loader;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 
 import java.io.*;
+import java.net.URL;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,6 +30,8 @@ public class LoggerTest extends AbsCommonTest{
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
+
+
 
         InternalLogger LOGGER = InternalLoggerFactory.getInstance(LoggerTest.class);
         LOGGER.debug("heheh");
