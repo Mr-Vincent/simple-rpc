@@ -3,6 +3,8 @@ package top.weidong.benchmark;
 import top.weidong.example.ITest;
 import top.weidong.example.impl.TestImpl;
 import top.weidong.network.SServer;
+import top.weidong.registry.RegistryService;
+import top.weidong.registry.zk.ZookeeperRegistryService;
 import top.weidong.service.DefaultServer;
 
 import java.io.IOException;
@@ -18,8 +20,11 @@ import java.io.IOException;
 public class BenchmarkProviderTest {
 
     public static void main(String[] args) throws IOException {
-        DefaultServer server = new DefaultServer().withServer(new SServer());
-        server.publish(ITest.class.getName(), TestImpl.class);
+        int port = 18866;
+        RegistryService registryService = new ZookeeperRegistryService();
+        registryService.connectToRegistryServer("localhost:2181");
+        DefaultServer server = new DefaultServer(registryService,port).withServer(new SServer(port));
+        server.publish(ITest.class,new TestImpl());
         server.start();
     }
 }

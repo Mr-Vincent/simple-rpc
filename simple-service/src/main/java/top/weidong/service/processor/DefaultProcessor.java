@@ -1,5 +1,7 @@
 package top.weidong.service.processor;
 
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastMethod;
 import top.weidong.common.util.ExceptionUtil;
 import top.weidong.common.util.IoUtil;
 import top.weidong.common.util.internal.logging.InternalLogger;
@@ -77,8 +79,12 @@ public class DefaultProcessor extends AbstractProcessor {
             if (serviceClass == null) {
                 throw new ClassNotFoundException(serviceName + " not found");
             }
-            Method method = serviceClass.getMethod(methodName, parameterTypes);
-            Object resultObj = method.invoke(serviceBean, arguments);
+            // Cglib reflect
+            FastClass serviceFastClass = FastClass.create(serviceClass);
+            FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
+            Object resultObj = serviceFastMethod.invoke(serviceBean, arguments);
+//            Method method = serviceClass.getMethod(methodName, parameterTypes);
+//            Object resultObj = method.invoke(serviceBean, arguments);
             LOGGER.debug("响应结果为：[{}]", resultObj);
             // 与请求消息id对应
             response.setRequestId(requestId);
