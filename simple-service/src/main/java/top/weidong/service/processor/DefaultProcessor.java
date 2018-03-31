@@ -9,18 +9,17 @@ import top.weidong.network.protocal.SResponse;
 import top.weidong.serializer.SerializationFactory;
 import top.weidong.serializer.Serializer;
 import top.weidong.service.DefaultServer;
-import top.weidong.service.SimpleContext;
 
-import javax.sound.midi.SoundbankResource;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
  * Description: 默认处理 耦合了序列化代码
+ * 反射调用 服务端完成后将结果字节码返回客户端
  *
  * @author dongwei
  * @date 2018/03/22
@@ -29,6 +28,12 @@ import java.util.Map;
 public class DefaultProcessor extends AbstractProcessor {
 
     private final static InternalLogger LOGGER = InternalLoggerFactory.getInstance(DefaultServer.class);
+
+    private Map<String,Object> handlerMap;
+
+    public DefaultProcessor(Map<String, Object> handlerMap) {
+        this.handlerMap = handlerMap;
+    }
 
     /**
      * 处理流  流的关闭一定要掌握好时机 不然一不小心就会报socket close异常
@@ -41,7 +46,6 @@ public class DefaultProcessor extends AbstractProcessor {
 
         LOGGER.debug("【{}】开始处理消息=====>>>>>>", System.currentTimeMillis());
 
-        Map<String, Class> serviceRegistry = SimpleContext.getServiceRegistry();
         byte[] result = null;
         try {
             // 客户端多写了4字节作为消息长度 这里多读4个字节
@@ -64,7 +68,9 @@ public class DefaultProcessor extends AbstractProcessor {
         String methodName = sRequest.getMethodName();
         Class<?>[] parameterTypes = sRequest.getParameterTypes();
         Object[] arguments = sRequest.getParameters();
-        Class serviceClass = serviceRegistry.get(serviceName);
+
+        Object serviceBean = handlerMap.get(serviceName);
+        Class<?> serviceClass = serviceBean.getClass();
 
         SResponse response = new SResponse();
         try {
@@ -72,7 +78,7 @@ public class DefaultProcessor extends AbstractProcessor {
                 throw new ClassNotFoundException(serviceName + " not found");
             }
             Method method = serviceClass.getMethod(methodName, parameterTypes);
-            Object resultObj = method.invoke(serviceClass.newInstance(), arguments);
+            Object resultObj = method.invoke(serviceBean, arguments);
             LOGGER.debug("响应结果为：[{}]", resultObj);
             // 与请求消息id对应
             response.setRequestId(requestId);

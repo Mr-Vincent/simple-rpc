@@ -14,8 +14,10 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
+import top.weidong.network.Directory;
 import top.weidong.registry.RegisterMeta;
 import top.weidong.registry.Registry;
+import top.weidong.registry.RegistryService;
 
 import static top.weidong.common.util.Preconditions.checkNotNull;
 import static top.weidong.common.util.StackTraceUtil.stackTrace;
@@ -28,13 +30,16 @@ import static top.weidong.common.util.StackTraceUtil.stackTrace;
  * @date 2018/03/29
  * Time: 17:37
  */
-public class ZookeeperRegistryService implements Registry {
+public class ZookeeperRegistryService implements Registry,RegistryService {
 
     private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(ZookeeperRegistryService.class);
     /**目录*/
     private static final String PROVIDER_PATH = "/simple/provider";
 
     private CuratorFramework client;
+
+    private String serviceAddress;
+
 
     @Override
     public void connectToRegistryServer(String connectString) {
@@ -57,10 +62,13 @@ public class ZookeeperRegistryService implements Registry {
     }
 
     /**
-     * 发布一个服务到注册中心
+     * 注册一个服务
+     * @param meta 注册信息 包含服务名称和服务地址
      */
-    public void publish(final RegisterMeta meta){
-        String directory = PROVIDER_PATH + "/" + meta.getProviderName();
+    @Override
+    public void register(final Directory meta){
+        LOGGER.info("RegisterMeta:{}",meta);
+        String directory = PROVIDER_PATH + "/" + meta.getServiceProviderName();
         try {
             if (client.checkExists().forPath(directory) == null) {
                 client.create()
@@ -74,7 +82,9 @@ public class ZookeeperRegistryService implements Registry {
                                 }
                             }
                         })
-                        .forPath(directory);
+                        .forPath(directory,meta.getServerAddress().getBytes());
+            } else {
+                client.setData().forPath(directory,meta.getServerAddress().getBytes());
             }
         } catch (Exception e) {
             if (LOGGER.isWarnEnabled()) {
@@ -88,15 +98,16 @@ public class ZookeeperRegistryService implements Registry {
      * 订阅一个服务
      * @param meta
      */
-    public void subscribe(RegisterMeta meta){
-        String directory = PROVIDER_PATH + "/" + meta.getProviderName();
+    @Override
+    public void subscribe(Directory meta){
+        String directory = PROVIDER_PATH + "/" + meta.getServiceProviderName();
         PathChildrenCache childrenCache = new PathChildrenCache(client, directory, false);
         childrenCache.getListenable().addListener(new PathChildrenCacheListener() {
             @Override
             public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
                 LOGGER.info("Child event: {}", pathChildrenCacheEvent);
                 switch (pathChildrenCacheEvent.getType()) {
-                    // todo 回掉实现
+                    // todo 回调实现
                     case CHILD_ADDED: {
                         LOGGER.info("child added");
                         break;
@@ -108,16 +119,29 @@ public class ZookeeperRegistryService implements Registry {
                     default:{
                         LOGGER.info("unknown event");
                     }
-
                 }
             }
         });
         try {
             childrenCache.start();
+            byte[] data = client.getData().forPath(directory);
+            serviceAddress = new String(data);
+            LOGGER.info("节点{}的数据：{}",directory,serviceAddress);
         } catch (Exception e) {
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Subscribe {} failed, {}.", directory, stackTrace(e));
             }
         }
+
+        LOGGER.info("subscribe success");
+    }
+
+    /**
+     * 获取服务地址
+     * @return
+     */
+    @Override
+    public String getServiceAddress() {
+        return serviceAddress;
     }
 }

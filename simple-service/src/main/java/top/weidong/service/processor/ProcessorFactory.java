@@ -3,6 +3,8 @@ package top.weidong.service.processor;
 import top.weidong.network.enums.ProcessorType;
 import top.weidong.network.processor.Processor;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * Description: processor 工厂类
@@ -15,16 +17,15 @@ public class ProcessorFactory {
 
     private ProcessorFactory() {
     }
-
     /**
      * 获取实例
-     *
      * @param type
+     * @param handler
      * @return
      */
-    public static Processor newInstance(ProcessorType type) {
+    public static Processor newInstance(ProcessorType type, Map<String,Object> handler) {
         if (ProcessorType.getDefault().equals(type)) {
-            return new DefaultProcessor();
+            return new DefaultProcessor(handler);
         } else if (ProcessorType.CONSOLE.equals(type)) {
             return new SimpleConsoleProcessor();
         } else if (ProcessorType.ECHO.equals(type)) {

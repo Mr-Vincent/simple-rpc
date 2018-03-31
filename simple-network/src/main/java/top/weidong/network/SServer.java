@@ -25,7 +25,7 @@ import static top.weidong.common.util.Preconditions.checkArgument;
 public class SServer {
 
     /** 监听端口（默认）*/
-    private static final int PORT = 9999;
+    private static final int PORT = 18866;
 
     /** 工作线程数*/
     private final static int WORKER_COUNT = Runtime.getRuntime().availableProcessors() * 2;

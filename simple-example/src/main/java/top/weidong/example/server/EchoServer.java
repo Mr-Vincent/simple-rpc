@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class EchoServer {
     public static void main(String[] args) throws IOException {
-        DefaultServer server = new DefaultServer(ProcessorType.CONSOLE).withServer(new SServer());
+        DefaultServer server = new DefaultServer(ProcessorType.CONSOLE,null).withServer(new SServer());
         server.start();
     }
 }

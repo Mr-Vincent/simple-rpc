@@ -29,6 +29,11 @@ public class SClient {
         return this;
     }
 
+    public SClient connect(String address,int port,int timeout) throws IOException {
+        socket.connect(new InetSocketAddress(address,port),timeout);
+        return this;
+    }
+
     public void close() throws IOException {
         socket.close();
     }
