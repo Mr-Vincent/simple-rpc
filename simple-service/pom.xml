@@ -16,7 +16,7 @@
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-network</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -27,12 +27,12 @@
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-serializer</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-registry</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

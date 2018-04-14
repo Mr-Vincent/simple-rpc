@@ -15,12 +15,12 @@
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-common</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>top.wei-dong</groupId>
             <artifactId>simple-service</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <!--<dependency>-->
             <!--<artifactId>junit</artifactId>-->

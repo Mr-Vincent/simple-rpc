@@ -5,7 +5,7 @@ import top.weidong.network.payload.SRequestPayload;
 
 /**
  * Created with IntelliJ IDEA.
- * Description: 服务提供者处理器
+ * Description: 服务提供者处理器 仅处理业务逻辑
  *
  * @author dongwei
  * @date 2018/04/02
