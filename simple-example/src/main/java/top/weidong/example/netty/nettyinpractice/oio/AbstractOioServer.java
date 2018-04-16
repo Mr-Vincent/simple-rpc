@@ -10,7 +10,7 @@ import io.netty.handler.logging.LoggingHandler;
 
 /**
  * Created with IntelliJ IDEA.
- * Description: oio server 抽象实现1
+ * Description: oio server 抽象实现
  *
  * @author dongwei
  * @date 2018/04/13
@@ -22,10 +22,9 @@ public abstract class AbstractOioServer {
 
     protected void run() throws InterruptedException {
         EventLoopGroup boss = new OioEventLoopGroup();
-        EventLoopGroup worker = new OioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         try {
-            serverBootstrap.group(boss,worker)
+            serverBootstrap.group(boss)
                     .channel(OioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -40,7 +39,6 @@ public abstract class AbstractOioServer {
             sync.channel().closeFuture().sync();
         } finally {
             boss.shutdownGracefully();
-            worker.shutdownGracefully();
         }
     }
 }
