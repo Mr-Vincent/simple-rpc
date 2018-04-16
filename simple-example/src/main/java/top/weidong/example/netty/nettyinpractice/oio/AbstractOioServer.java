@@ -21,6 +21,8 @@ public abstract class AbstractOioServer {
     protected abstract ChannelHandler[] handlers();
 
     protected void run() throws InterruptedException {
+        // 注意到这个OioEventLoopGroup的构造参数表达的含义和NioEventLoopGroup的参数表达含义是不一样的
+        // 这个入参代表最大的channel数量 也就是最大连接数 但是，如果填1任何客户端都连不上 会报异常 必须填客户端数量+1
         EventLoopGroup boss = new OioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         try {

@@ -42,7 +42,7 @@ public class CounterServer extends AbstractNioServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new CounterServer().run();
+        new CounterServer().run(false);
     }
 
     @ChannelHandler.Sharable

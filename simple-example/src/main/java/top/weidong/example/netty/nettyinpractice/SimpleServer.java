@@ -24,7 +24,7 @@ public class SimpleServer extends AbstractNioServer {
 
 
     public static void main(String[] args) throws InterruptedException {
-        new SimpleServer().run();
+        new SimpleServer().run(false);
     }
 
     @Override

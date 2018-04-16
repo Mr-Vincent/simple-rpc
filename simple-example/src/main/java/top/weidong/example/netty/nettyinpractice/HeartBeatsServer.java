@@ -38,7 +38,7 @@ public class HeartBeatsServer extends AbstractNioServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new HeartBeatsServer().run();
+        new HeartBeatsServer().run(false);
     }
 
 

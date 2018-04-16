@@ -18,14 +18,34 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public abstract class AbstractNioServer {
 
+    private final ServerBootstrap serverBootstrap = new ServerBootstrap();
+
+    private EventLoopGroup boss;
+    private EventLoopGroup worker;
+
     protected abstract ChannelHandler[] addHandlers();
 
-    protected void run() throws InterruptedException {
-        EventLoopGroup boss = new NioEventLoopGroup();
-        EventLoopGroup worker = new NioEventLoopGroup();
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
+    protected ServerBootstrap eventLoopGroupMode(boolean single){
+        boss = new NioEventLoopGroup();
+        if (single) {
+            boss = new NioEventLoopGroup(1);
+            return this.serverBootstrap.group(boss);
+        } else {
+            worker = new NioEventLoopGroup();
+            return this.serverBootstrap.group(boss,worker);
+        }
+    }
+
+    protected void shutdownGracefully(boolean single){
+        if (!single) {
+            worker.shutdownGracefully();
+        }
+        boss.shutdownGracefully();
+    }
+
+    protected void run(boolean single) throws InterruptedException {
         try {
-            serverBootstrap.group(boss,worker)
+            this.eventLoopGroupMode(single)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -39,8 +59,7 @@ public abstract class AbstractNioServer {
             ChannelFuture sync = serverBootstrap.bind(9999).sync();
             sync.channel().closeFuture().sync();
         } finally {
-            boss.shutdownGracefully();
-            worker.shutdownGracefully();
+            shutdownGracefully(single);
         }
     }
 }

@@ -24,7 +24,7 @@ public class ReconnectServer extends HeartBeatsServer {
 
 
     public static void main(String[] args) throws InterruptedException {
-        new ReconnectServer().run();
+        new ReconnectServer().run(false);
     }
 
     @Override
