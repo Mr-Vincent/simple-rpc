@@ -31,7 +31,7 @@ public class SingleThreadNioServer extends AbstractNioServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new SingleThreadNioServer().run(true);
+        new SingleThreadNioServer().run(false);
     }
 
     /**

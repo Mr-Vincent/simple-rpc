@@ -20,6 +20,6 @@ public class OioServer extends AbstractOioServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new OioServer().run();
+        new OioServer().run(false);
     }
 }
