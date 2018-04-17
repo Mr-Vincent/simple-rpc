@@ -23,15 +23,25 @@ public abstract class AbstractNioServer {
     private EventLoopGroup boss;
     private EventLoopGroup worker;
 
+    protected int bossCnt = 0;
+    protected int workerCnt = 0;
+
+
+    protected AbstractNioServer bossAndWorkerCntSettings(int bossCnt,int workerCnt){
+        //throw new UnsupportedOperationException("未设置boss & worker 个数！");
+        this.bossCnt = bossCnt;
+        this.workerCnt = workerCnt;
+        return this;
+    }
     protected abstract ChannelHandler[] addHandlers();
 
     protected ServerBootstrap eventLoopGroupMode(boolean single){
-        boss = new NioEventLoopGroup();
+        boss = new NioEventLoopGroup(bossCnt);
         if (single) {
             boss = new NioEventLoopGroup(1);
             return this.serverBootstrap.group(boss);
         } else {
-            worker = new NioEventLoopGroup();
+            worker = new NioEventLoopGroup(workerCnt);
             return this.serverBootstrap.group(boss,worker);
         }
     }
