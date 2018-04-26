@@ -390,7 +390,6 @@ private void register0(ChannelPromise promise) {
                 // again so that we process inbound data.
                 //
                 // See https://github.com/netty/netty/issues/4805
-                // 这里又是一个死循环 轮询客户端的连接 让阻塞操作变为非阻塞（设置了一个超时时间）
                 beginRead();
             }
         }
@@ -476,7 +475,7 @@ private void doStartThread() {
 protected void run() {
 	 // 死循环
     for (;;) {
-    	 // 这里的task就是AbstractUnsafe#register0的逻辑
+    	 // 这里的task就是AbstractUnsafe#register0的逻辑 当然也有可能是其他的
         Runnable task = takeTask();
         if (task != null) {
             task.run();
@@ -505,3 +504,422 @@ protected void run() {
 ```
 
 整了这么多，依旧没有搞明白这个register到底在做什么。但是明白了一件事：找到了启动入口。
+
+### 注册逻辑
+在原生OIO网络编程中，实现一个服务器需要做这几个步骤：
+
+* 创建ServerSocket对象绑定监听端口。
+* 通过accept()方法监听客户端的请求。
+* 建立连接后，通过输入输出流读取客户端发送的请求信息。
+* 通过输出流向客户端发送请求信息。
+* 关闭相关资源。
+
+```java
+try{
+    ServerSocket server=null;
+    try{
+        server=new ServerSocket(5209);
+        //b)指定绑定的端口，并监听此端口。
+        System.out.println("服务器启动成功");
+        //创建一个ServerSocket在端口5209监听客户请求
+    }catch(Exception e) {
+            System.out.println("没有启动监听："+e);
+            //出错，打印出错信息
+    }
+    Socket socket=null;
+    try{
+        socket=server.accept();
+        //2、调用accept()方法开始监听，等待客户端的连接 
+        //使用accept()阻塞等待客户请求，有客户
+        //请求到来则产生一个Socket对象，并继续执行
+    }catch(Exception e) {
+        System.out.println("Error."+e);
+        //出错，打印出错信息
+    }
+```
+在Netty中的实现基本如此，只不过代码结构比较复杂罢了。这段代码在Netty中的的实现在OioServerSocketChannel中：
+
+```java
+@Override
+protected void doBind(SocketAddress localAddress) throws Exception {
+    socket.bind(localAddress, config.getBacklog());
+}
+@Override
+protected int doReadMessages(List<Object> buf) throws Exception {
+    if (socket.isClosed()) {
+        return -1;
+    }
+    try {
+        Socket s = socket.accept();
+        try {
+            buf.add(new OioSocketChannel(this, s));
+            return 1;
+        } catch (Throwable t) {
+            logger.warn("Failed to create a new channel from an accepted socket.", t);
+            try {
+                s.close();
+            } catch (Throwable t2) {
+                logger.warn("Failed to close a socket.", t2);
+            }
+        }
+    } catch (SocketTimeoutException e) {
+        // Expected
+    }
+    return 0;
+}
+```
+先绑定端口，再接受连接。这个接受连接是伪非阻塞的。因为用于连接的线程只有一个，没有客户端连进来的时候不能将其阻塞调。客户端连进来了就将这个「连接」交给别的线程处理，每个连接对应一个线程。这样就做到了连接和io处理不冲突。
+
+当然，最后的执行肯定是到这一步，但是具体的执行调用过程可称得上困难重重。仔细回头看这个register0的处理逻辑，发现好像仅仅启动了一个线程，用于不断从队列中取任务执行的死循环而已。似乎没有直接表现出像绑定端口，接受连接的迹象。不能慌，这个老b隐藏得很深。回到最开始的地方，这个仅仅是register，姑且就到这里，先继续往下看，看到底又有什么新发现。
+
+```java
+private ChannelFuture doBind(final SocketAddress localAddress) {
+    final ChannelFuture regFuture = initAndRegister();
+    final Channel channel = regFuture.channel();
+    if (regFuture.cause() != null) {
+        return regFuture;
+    }
+    if (regFuture.isDone()) {
+        // At this point we know that the registration was complete and successful.
+        ChannelPromise promise = channel.newPromise();
+        doBind0(regFuture, channel, localAddress, promise);
+        return promise;
+    } 
+    // 省略。。。
+}
+```
+
+initAndRegister方法经历千山万水终于启动了一个线程，目的就是返回一个ChannelFuture，先不管这个ChannelFuture到底是什么鬼，先将其理解为JDK中的Future的增强实现。一旦这个Future完成了，调用doBind0:
+
+```java
+private static void doBind0(
+            final ChannelFuture regFuture, final Channel channel,
+            final SocketAddress localAddress, final ChannelPromise promise) {
+    // This method is invoked before channelRegistered() is triggered.  Give user handlers a chance to set up
+    // the pipeline in its channelRegistered() implementation.
+    channel.eventLoop().execute(new Runnable() {
+        @Override
+        public void run() {
+            if (regFuture.isSuccess()) {
+                channel.bind(localAddress, promise).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+            } else {
+                promise.setFailure(regFuture.cause());
+            }
+        }
+    });
+}
+```
+
+看到了吧，这个鬼又向队列中添加了一个任务。这个任务核心就是去绑定。想都不用想，这个绑定一定是AbstractChannel中的方法：
+
+```java
+@Override
+public ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise) {
+    return pipeline.bind(localAddress, promise);
+}
+// pipeline的bind有是其默认实现类中的子类TailContext中的实现
+@Override
+public final ChannelFuture bind(SocketAddress localAddress, ChannelPromise promise) {
+    return tail.bind(localAddress, promise);
+}
+@Override
+public ChannelFuture bind(final SocketAddress localAddress, final ChannelPromise promise) {
+    // 省略。。。
+    final AbstractChannelHandlerContext next = findContextOutbound();
+    EventExecutor executor = next.executor();
+    if (executor.inEventLoop()) {
+        next.invokeBind(localAddress, promise);
+    } else {
+        safeExecute(executor, new Runnable() {
+            @Override
+            public void run() {
+                next.invokeBind(localAddress, promise);
+            }
+        }, promise, null);
+    }
+    return promise;
+}
+```
+最后的bind是最终的核心逻辑。先找OutboundContext：
+
+```java
+private AbstractChannelHandlerContext findContextOutbound() {
+    AbstractChannelHandlerContext ctx = this;
+    do {
+        ctx = ctx.prev;
+    } while (!ctx.outbound);
+    return ctx;
+}
+
+```
+注意，调用这个方法的是tail，关于pipeline的结构有必要了解一下。![image](https://segmentfault.com/img/bVEPxn?w=2387&h=584)
+
+我们在这个Server初始化的时候添加了handler，比如LoggingHandler等。这些handler都会被添加到tail和head之间。即使你不添加任何handler，netty也会把自己内部的handler添加进去。handler又分为in和out，分别代表入站和出站。这段代码就是找出站的(只有out的才有bind方法)，一直向head方向找（废话，自己都是tail了只能往前找，后面没有了）。找到一个就算数，直接返回这个context。接着就是调用invokeBind方法：
+
+```java
+private void invokeBind(SocketAddress localAddress, ChannelPromise promise) {
+    if (invokeHandler()) {
+        try {
+            ((ChannelOutboundHandler) handler()).bind(this, localAddress, promise);
+        } catch (Throwable t) {
+            notifyOutboundHandlerException(t, promise);
+        }
+    } else {
+        bind(localAddress, promise);
+    }
+}
+```
+
+最终的bind方法在if分支中。具体的执行逻辑为实现了out的handler，例如LoggingHandler：
+
+```java
+@Override
+public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+    if (logger.isEnabled(internalLevel)) {
+        logger.log(internalLevel, format(ctx, "BIND", localAddress));
+    }
+    ctx.bind(localAddress, promise);
+}
+```
+显然这个handler仅仅只是来打印log的，完事之后又交给父类去执行。而父类依然是那段。因为之前是找到第一个实现out的handler就算数，这里又回到了这个pipeline中，继续往前找，最终会找到head（head不仅是out而且还是in，就是这么屌）。最终调用的是headcontext中的bind，而它的bind却是使用的是unsafe的bind：
+
+```java
+@Override
+public void bind(
+        ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
+        throws Exception {
+    unsafe.bind(localAddress, promise);
+}
+
+@Override
+public final void bind(final SocketAddress localAddress, final ChannelPromise promise) {
+    assertEventLoop();
+    if (!promise.setUncancellable() || !ensureOpen(promise)) {
+        return;
+    }
+    // See: https://github.com/netty/netty/issues/576
+    if (Boolean.TRUE.equals(config().getOption(ChannelOption.SO_BROADCAST)) &&
+        localAddress instanceof InetSocketAddress &&
+        !((InetSocketAddress) localAddress).getAddress().isAnyLocalAddress() &&
+        !PlatformDependent.isWindows() && !PlatformDependent.maybeSuperUser()) {
+        // Warn a user about the fact that a non-root user can't receive a
+        // broadcast packet on *nix if the socket is bound on non-wildcard address.
+        logger.warn(
+                "A non-root user can't receive a broadcast packet if the socket " +
+                "is not bound to a wildcard address; binding to a non-wildcard " +
+                "address (" + localAddress + ") anyway as requested.");
+    }
+    // 这个逻辑是有意思的 返回值为 !socket.isClosed()&& socket.isBound()
+    // 没关且绑定了才为true 这里一定为false 因为肯定没绑定
+    boolean wasActive = isActive();
+    try {
+    	 // 看到这行代码就够了 其他不管
+        doBind(localAddress);
+    } catch (Throwable t) {
+        safeSetFailure(promise, t);
+        closeIfClosed();
+        return;
+    }
+	 // 绑定完了isActive()肯定为true
+    if (!wasActive && isActive()) {
+        // 这段代码也得看
+        invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pipeline.fireChannelActive();
+            }
+        });
+    }
+
+    safeSetSuccess(promise);
+}
+```
+看到doBind就知道怎么回事了，这就是之前所说的OioServerSocketChannel的doBind。终于完成了第一步：绑定端口。
+接下来就是监听客户端连接，在invokeLater中将其实现了，一探究竟：
+
+```java
+private void invokeLater(Runnable task) {
+    try {
+        eventLoop().execute(task);
+    } catch (RejectedExecutionException e) {
+        logger.warn("Can't invoke task later as EventLoop rejected it", e);
+    }
+}
+```
+果然，依旧把这个任务放到线程中去执行了。这个任务到底是什么，很重要。代码中只给了一段``pipeline.fireChannelActive()``.看看具体实现吧：
+
+```java
+@Override
+public final ChannelPipeline fireChannelActive() {
+    AbstractChannelHandlerContext.invokeChannelActive(head);
+    return this;
+}
+// context为head 又交给了EventExecutor去执行
+static void invokeChannelActive(final AbstractChannelHandlerContext next) {
+    EventExecutor executor = next.executor();
+    if (executor.inEventLoop()) {
+        next.invokeChannelActive();
+    } else {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                next.invokeChannelActive();
+            }
+        });
+    }
+}
+// 调用的是head的实现
+private void invokeChannelActive() {
+    if (invokeHandler()) {
+        try {
+            ((ChannelInboundHandler) handler()).channelActive(this);
+        } catch (Throwable t) {
+            notifyHandlerException(t);
+        }
+    } else {
+        fireChannelActive();
+    }
+}
+// head的channelActive 这里的套路和之前的一样，先调用父类的 继续找pipeline中的handler只不过方向相反（从head到tail） 依次类推 如果某个handler不去调用ctx了，那么事件就到此为止不会传递下去了
+@Override
+public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    ctx.fireChannelActive();
+	 // 这段代码是重点
+    readIfIsAutoRead();
+}
+// 父类的fireChannelActive
+@Override
+public ChannelHandlerContext fireChannelActive() {
+    invokeChannelActive(findContextInbound());
+    return this;
+}
+```
+最终，一定一定是要做我们在OIO原生编程中的第二步了：接受连接了。
+
+```java
+private void readIfIsAutoRead() {
+    if (channel.config().isAutoRead()) {
+        channel.read();
+    }
+}
+// OioSocketChannel的read 实际上是父类的
+@Override
+public Channel read() {
+    pipeline.read();
+    return this;
+}
+// 调用的是pipeline的read
+@Override
+public final ChannelPipeline read() {
+    tail.read();
+    return this;
+}
+// tail的read
+@Override
+public ChannelHandlerContext read() {
+    final AbstractChannelHandlerContext next = findContextOutbound();
+    EventExecutor executor = next.executor();
+    if (executor.inEventLoop()) {
+        next.invokeRead();
+    } else {
+        Runnable task = next.invokeReadTask;
+        if (task == null) {
+            next.invokeReadTask = task = new Runnable() {
+                @Override
+                public void run() {
+                    next.invokeRead();
+                }
+            };
+        }
+        executor.execute(task);
+    }
+
+    return this;
+}
+```
+
+看到这里我又打脸了，还有这么多层的调用！但是不要慌，因为逻辑是类似的。都是在pipeline这条链上找handler来调用，爱调不调的思想。这里的顺序是从tail到head。如果这个链中有哪个不长眼的没有将事件传递下去，那么最终就到不了head。正常情况下是一定要到head的。
+
+```java
+@Override
+public void read(ChannelHandlerContext ctx) {
+    unsafe.beginRead();
+}
+// 什么都得考unsafe
+@Override
+public final void beginRead() {
+    assertEventLoop();
+    if (!isActive()) {
+        return;
+    }
+    try {
+        doBeginRead();
+    } catch (final Exception e) {
+        invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pipeline.fireExceptionCaught(e);
+            }
+        });
+        close(voidPromise());
+    }
+}
+// 最终还是将其丢给了eventLoop去执行 readTask是核心
+@Override
+protected void doBeginRead() throws Exception {
+    if (readPending) {
+        return;
+    }
+    readPending = true;
+    eventLoop().execute(readTask);
+}
+```
+这个readTask先将其定义好了，没有直接使用匿名内部类。一股清流啊！
+
+```java
+private final Runnable readTask = new Runnable() {
+    @Override
+    public void run() {
+        doRead();
+    }
+};
+
+```
+
+这个doRead有2个实现AbstractOioByteChannel和AbstractOioMessageChannel看名字都能知道区别，一个是读字节一个是读对象。最大的区别是OioByteStreamChannel是OioSocketChannel的父类而AbstractOioMessageChannel是OioServerSocketChannel的父类。这里使用的实现不用说也知道了。
+
+```java
+@Override
+protected void doRead() {
+    // 太多省略不看
+    final ChannelConfig config = config();
+    final ChannelPipeline pipeline = pipeline();
+    final RecvByteBufAllocator.Handle allocHandle = unsafe().recvBufAllocHandle();
+    allocHandle.reset(config);
+    boolean closed = false;
+    Throwable exception = null;
+    try {
+        do {
+            // Perform a read. 关键点
+            int localRead = doReadMessages(readBuf);
+            if (localRead == 0) {
+                break;
+            }
+            if (localRead < 0) {
+                closed = true;
+                break;
+            }
+
+            allocHandle.incMessagesRead(localRead);
+        } while (allocHandle.continueReading());
+    } catch (Throwable t) {
+        exception = t;
+    }
+    // 不看
+}
+```
+
+最终这个doReadMessages就是OioServerSocketChannel的实现。将监听客户端连接也放到了任务队列中，让线程去轮询。至于怎么去把消息读出来以及这个过程是怎样的，这是以后的事情。因为这次基本上将整个netty的核心组件都接触到了。接下来的源码解读会稍微轻松点。
+
+### 总结
+Netty真屌，不接受反驳😂！
