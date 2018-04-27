@@ -13,19 +13,25 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2018/03/21
  * Time: 16:45
  */
-public class NamedThreadFactory implements ThreadFactory{
+public class NamedThreadFactory implements ThreadFactory {
     private static final AtomicInteger poolNumber = new AtomicInteger(1);
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private String name;
     private final ThreadGroup group;
-    public NamedThreadFactory(String name){
+
+    public static NamedThreadFactory createDefault(String name){
+        return new NamedThreadFactory(name);
+    }
+
+    public NamedThreadFactory(String name) {
         String defName = "pool-" + poolNumber.getAndIncrement() + "-thread-";
-        this.name = StringUtils.isEmpty(name) ? defName : name +"#" +threadNumber.getAndIncrement();
+        this.name = StringUtils.isEmpty(name) ? defName : name + "#" + threadNumber.getAndIncrement();
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() :
                 Thread.currentThread().getThreadGroup();
 
     }
+
     @Override
     public Thread newThread(Runnable r) {
         Thread t = new Thread(group, r,
@@ -34,7 +40,7 @@ public class NamedThreadFactory implements ThreadFactory{
         if (t.isDaemon()) {
             t.setDaemon(false);
         }
-        if (t.getPriority() != Thread.NORM_PRIORITY){
+        if (t.getPriority() != Thread.NORM_PRIORITY) {
             t.setPriority(Thread.NORM_PRIORITY);
         }
         return t;

@@ -8,6 +8,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.oio.OioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import top.weidong.common.util.NamedThreadFactory;
+import top.weidong.example.netty.nettyinpractice.eventloop.MyOioEventLoop;
+
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,16 +29,18 @@ public abstract class AbstractOioServer {
     protected EventLoopGroup boss;
     protected EventLoopGroup worker;
 
+    protected ThreadFactory threadFactory = NamedThreadFactory.createDefault("oio boss eventloop");
+
 
     protected abstract ChannelHandler[] handlers();
 
     protected ServerBootstrap eventLoopGroupMode(boolean single){
-        boss = new OioEventLoopGroup();
+        boss = new MyOioEventLoop(threadFactory);
         if (single) {
-            boss = new OioEventLoopGroup(1);
+            boss = new MyOioEventLoop(1);
             return this.serverBootstrap.group(boss);
         } else {
-            worker = new OioEventLoopGroup();
+            worker = new MyOioEventLoop(threadFactory);
             return this.serverBootstrap.group(boss,worker);
         }
     }
