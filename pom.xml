@@ -15,6 +15,7 @@
         <module>simple-benchmark</module>
         <module>simple-serializer</module>
         <module>simple-registry</module>
+        <module>simple-transport</module>
     </modules>
     <!--为pom不生成target文件夹 为jar则生成target-->
     <packaging>pom</packaging>
