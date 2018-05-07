@@ -1,5 +1,6 @@
 package top.weidong.transport.loop;
 
+import top.weidong.transport.handler.Handler;
 import top.weidong.transport.loop.BaseLoop;
 
 import java.net.Socket;
@@ -19,15 +20,21 @@ public class WorkerLoop extends BaseLoop {
 
     private ThreadFactory threadFactory;
 
-    public void processIO(List<Socket> buf) {
+    public void processIO(List<Socket> buf, final List<Handler> handlers) {
         for (final Socket s: buf) {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    System.out.println(s);
+                    doProcessIO(s,handlers);
                 }
             };
             execute(task);
+        }
+    }
+
+    private void doProcessIO(Socket socket,List<Handler> handlers) {
+        for (Handler handler : handlers) {
+            handler.process(socket);
         }
     }
 

@@ -1,6 +1,7 @@
 package top.weidong.example.netty.nettyinpractice.oio;
 
 import io.netty.channel.ChannelHandler;
+import io.netty.handler.logging.LoggingHandler;
 import top.weidong.example.netty.nettyinpractice.handlers.GenericHandler;
 
 /**
@@ -14,8 +15,9 @@ import top.weidong.example.netty.nettyinpractice.handlers.GenericHandler;
 public class OioServer extends AbstractOioServer {
     @Override
     protected ChannelHandler[] handlers() {
-        return new ChannelHandler[] {
-            new GenericHandler()
+        return new ChannelHandler[]{
+                new LoggingHandler(),
+                new GenericHandler()
         };
     }
 

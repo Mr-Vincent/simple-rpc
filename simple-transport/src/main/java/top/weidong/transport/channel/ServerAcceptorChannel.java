@@ -3,12 +3,13 @@ package top.weidong.transport.channel;
 import com.google.common.collect.Lists;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
-import top.weidong.transport.loop.BaseLoop;
+import top.weidong.transport.handler.Handler;
 import top.weidong.transport.loop.BossLoop;
 import top.weidong.transport.loop.WorkerLoop;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,9 +25,10 @@ public class ServerAcceptorChannel {
     private static final InternalLogger LOGGER =
             InternalLoggerFactory.getInstance(ServerAcceptorChannel.class);
 
-    final ServerSocket socket;
+    private final ServerSocket socket;
     private static final int SO_TIMEOUT = 500;
 
+    private List<Handler> handlers = Lists.newArrayList();
 
     private static ServerSocket newServerSocket() {
         try {
@@ -85,7 +87,7 @@ public class ServerAcceptorChannel {
                     while (true) {
                         int ret = processAcceptance(buf);
                         if (ret > 0) {
-                            worker.processIO(buf);
+                            worker.processIO(buf,handlers);
                             buf.clear();
                         }
                     }
@@ -126,5 +128,9 @@ public class ServerAcceptorChannel {
             // Expected
         }
         return 0;
+    }
+
+    public void handlers(Handler[] handlers) {
+        this.handlers = Arrays.asList(handlers);
     }
 }

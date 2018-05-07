@@ -3,6 +3,8 @@ package top.weidong.transport;
 import org.junit.Test;
 import top.weidong.common.util.NamedThreadFactory;
 import top.weidong.transport.channel.ServerAcceptorChannel;
+import top.weidong.transport.handler.Handler;
+import top.weidong.transport.handler.LoggerHandler;
 import top.weidong.transport.loop.BossLoop;
 import top.weidong.transport.loop.WorkerLoop;
 
@@ -33,6 +35,7 @@ public class SimpleServer {
 
         BossLoop bossLoop = new BossLoop();
         WorkerLoop workerLoop = new WorkerLoop(factory);
+        acceptor.handlers(new Handler[]{new LoggerHandler()});
         acceptor.startWithLoop(bossLoop,workerLoop);
 
         synchronized (acceptor) {
