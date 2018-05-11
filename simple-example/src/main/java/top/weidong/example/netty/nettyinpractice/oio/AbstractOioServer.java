@@ -29,18 +29,19 @@ public abstract class AbstractOioServer {
     protected EventLoopGroup boss;
     protected EventLoopGroup worker;
 
-    protected ThreadFactory threadFactory = NamedThreadFactory.createDefault("oio boss eventloop");
+    protected ThreadFactory bossThreadFactory = NamedThreadFactory.createDefault("oio boss eventloop");
+    protected ThreadFactory workerThreadFactory = NamedThreadFactory.createDefault("oio worker eventloop");
 
 
     protected abstract ChannelHandler[] handlers();
 
     protected ServerBootstrap eventLoopGroupMode(boolean single){
-        boss = new MyOioEventLoop(threadFactory);
+        boss = new MyOioEventLoop(bossThreadFactory);
         if (single) {
             boss = new MyOioEventLoop(1);
             return this.serverBootstrap.group(boss);
         } else {
-            worker = new MyOioEventLoop(threadFactory);
+            worker = new MyOioEventLoop(workerThreadFactory);
             return this.serverBootstrap.group(boss,worker);
         }
     }
