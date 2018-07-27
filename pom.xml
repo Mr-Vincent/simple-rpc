@@ -16,6 +16,7 @@
         <module>simple-serializer</module>
         <module>simple-registry</module>
         <module>simple-transport</module>
+        <module>simple-spring-support</module>
     </modules>
     <!--为pom不生成target文件夹 为jar则生成target-->
     <packaging>pom</packaging>
@@ -42,6 +43,8 @@
         <javaassit.version>3.20.0-GA</javaassit.version>
         <cglib.version>3.2.2</cglib.version>
         <bytebuddy.version>1.6.3</bytebuddy.version>
+        <spring-framework.version>4.3.14.RELEASE</spring-framework.version>
+
     </properties>
 
 
@@ -168,6 +171,12 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>${bytebuddy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring-framework.version}</version>
             </dependency>
 
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:myns="http://www.mycompany.com/schema/myns"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.mycompany.com/schema/myns
+       http://www.mycompany.com/schema/myns/myns.xsd">
+
+    <myns:dateformat id="dateFormat"
+                     pattern="yyyy-MM-dd HH:mm"
+                     lenient="true"/>
+
+    <bean id="print" class="top.weidong.spring.MySimple">
+        <property name="format" ref="dateFormat">
+        </property>
+        <property name="flag" value="true"/>
+    </bean>
+
+</beans>
