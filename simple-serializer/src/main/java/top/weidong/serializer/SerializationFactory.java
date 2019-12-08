@@ -4,7 +4,6 @@ import top.weidong.common.util.Maps;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 import top.weidong.serializer.enums.SerializerType;
-import top.weidong.serializer.jdk.JdkSerializer;
 
 import java.util.Map;
 import java.util.ServiceLoader;

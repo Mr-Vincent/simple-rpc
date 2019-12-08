@@ -22,6 +22,10 @@
             <artifactId>simple-service</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
         <!--<dependency>-->
             <!--<artifactId>junit</artifactId>-->
             <!--<version>4.12</version>-->

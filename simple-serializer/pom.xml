@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>simple-serializer</artifactId>
-    <description>序列化工具</description>
+    <description>serializer lib</description>
 
     <dependencies>
         <dependency>

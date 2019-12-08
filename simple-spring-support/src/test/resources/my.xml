@@ -17,4 +17,6 @@
         <property name="flag" value="true"/>
     </bean>
 
+    <bean class="top.weidong.spring.InitializingBeanTest"/>
+
 </beans>

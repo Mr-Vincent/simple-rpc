@@ -18,5 +18,8 @@ public class ApplicationMain {
         String currentTime = mySimple.print();
         System.out.println(currentTime);
         System.out.println(mySimple.flag());
+
+        InitializingBeanTest initializingBeanTest = ctx.getBean(InitializingBeanTest.class);
+        System.out.println(initializingBeanTest);
     }
 }

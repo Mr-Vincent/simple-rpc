@@ -39,11 +39,12 @@
         <kryo.version>2.23.0</kryo.version>
         <objenesis.version>2.1</objenesis.version>
         <zookeeper.version>3.4.8</zookeeper.version>
-        <curator.version>2.9.1</curator.version>
+        <curator.version>4.2.0</curator.version>
         <javaassit.version>3.20.0-GA</javaassit.version>
         <cglib.version>3.2.2</cglib.version>
         <bytebuddy.version>1.6.3</bytebuddy.version>
         <spring-framework.version>4.3.14.RELEASE</spring-framework.version>
+        <metrics.version>4.1.1</metrics.version>
 
     </properties>
 
@@ -177,6 +178,12 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${spring-framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${metrics.version}</version>
             </dependency>
 
 

@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class SimpleDemo {
                 while (true) {
                     // 处理 每个连接是否可读, 这里的逻辑是 读4个字节后切断连接
                     for (SocketChannel socketChannel : Lists.newArrayList(socketChannelList)) {
+                        System.out.println("connection incoming..."+socketChannel);
                         try {
                             ByteBuffer buf = ByteBuffer.allocate(4);
                             // 这段代码才是空转
@@ -51,9 +53,10 @@ public class SimpleDemo {
                         }
                     }
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                     }
+                    System.out.println("===");
                 }
             }
         }, "server-handler-thread").start();
@@ -64,6 +67,7 @@ public class SimpleDemo {
             if (socketChannel != null) {
                 socketChannelList.add(socketChannel);
             }
+            System.out.println("waiting......." + new Date());
             Thread.sleep(1000);
         }
     }

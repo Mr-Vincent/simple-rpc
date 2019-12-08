@@ -107,7 +107,6 @@ public class ZookeeperRegistryService implements Registry,RegistryService {
             public void childEvent(CuratorFramework curatorFramework, PathChildrenCacheEvent pathChildrenCacheEvent) throws Exception {
                 LOGGER.info("Child event: {}", pathChildrenCacheEvent);
                 switch (pathChildrenCacheEvent.getType()) {
-                    // todo 回调实现
                     case CHILD_ADDED: {
                         LOGGER.info("child added");
                         break;

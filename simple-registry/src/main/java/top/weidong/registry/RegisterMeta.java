@@ -57,7 +57,7 @@ public class RegisterMeta extends Directory {
 
     @Override
     public String getServiceProviderName() {
-        return null;
+        return providerName;
     }
 
     @Override
