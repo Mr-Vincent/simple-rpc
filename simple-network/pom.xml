@@ -10,7 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>simple-network</artifactId>
+    <packaging>pom</packaging>
     <description>note:网络层实现 不能有业务代码</description>
+    <modules>
+        <module>network-api</module>
+        <module>network-bio</module>
+    </modules>
 
     <dependencies>
         <dependency>

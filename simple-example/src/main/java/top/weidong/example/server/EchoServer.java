@@ -1,7 +1,7 @@
 package top.weidong.example.server;
 
-import top.weidong.network.SServer;
-import top.weidong.network.enums.ProcessorType;
+import network.SServer;
+import network.enums.ProcessorType;
 import top.weidong.service.DefaultServer;
 
 import java.io.IOException;

@@ -2,7 +2,7 @@ package top.weidong.benchmark;
 
 import top.weidong.example.ITest;
 import top.weidong.example.impl.TestImpl;
-import top.weidong.network.SServer;
+import network.SServer;
 import top.weidong.registry.RegistryService;
 import top.weidong.registry.zk.ZookeeperRegistryService;
 import top.weidong.service.DefaultServer;

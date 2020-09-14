@@ -153,6 +153,23 @@ public abstract class IoUtil {
     }
 
     /**
+     * 向流中写int字节
+     * @param outputStream
+     * @param intValue
+     * @throws IOException
+     */
+    public static void writeInt(OutputStream outputStream, int intValue) throws IOException {
+        byte b0 = (byte) (intValue >>> 24);
+        byte b1 = (byte) (intValue >>> 16);
+        byte b2 = (byte) (intValue >>> 8);
+        byte b3 = (byte) intValue;
+        outputStream.write(b0);
+        outputStream.write(b1);
+        outputStream.write(b2);
+        outputStream.write(b3);
+    }
+
+    /**
      * 在流中读要读取的字节长度
      * @param inputStream
      * @return

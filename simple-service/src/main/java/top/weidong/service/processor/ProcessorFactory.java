@@ -1,7 +1,7 @@
 package top.weidong.service.processor;
 
-import top.weidong.network.enums.ProcessorType;
-import top.weidong.network.processor.Processor;
+import network.enums.ProcessorType;
+import too.weidong.network.bio.processor.Processor;
 
 import java.util.Map;
 

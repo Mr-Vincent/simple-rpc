@@ -1,17 +1,14 @@
 package top.weidong.service;
 
 import top.weidong.common.util.ExceptionUtil;
-import top.weidong.network.ConnectionWatcher;
-import top.weidong.network.Directory;
-import top.weidong.network.SClient;
-import top.weidong.registry.RegisterMeta;
+import network.ConnectionWatcher;
+import network.Directory;
+import network.SClient;
 import top.weidong.registry.RegistryService;
 import top.weidong.registry.zk.ZookeeperRegistryService;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.

@@ -2,9 +2,9 @@ package top.weidong.example.client;
 
 
 import top.weidong.example.ITest;
-import top.weidong.network.ConnectionWatcher;
-import top.weidong.network.Directory;
-import top.weidong.network.SClient;
+import network.ConnectionWatcher;
+import network.Directory;
+import network.SClient;
 import top.weidong.registry.RegisterMeta;
 import top.weidong.service.DefaultClient;
 import top.weidong.service.invoker.Invoker;
