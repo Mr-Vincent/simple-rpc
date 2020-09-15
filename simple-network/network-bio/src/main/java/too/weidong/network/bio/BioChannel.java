@@ -1,5 +1,6 @@
 package too.weidong.network.bio;
 
+import too.weidong.network.bio.payload.HeartBeats;
 import too.weidong.network.bio.payload.SimpleRequestPayload;
 import too.weidong.network.bio.payload.SimpleResponsePayload;
 import top.weidong.common.util.IoUtil;
@@ -18,7 +19,7 @@ import java.util.UUID;
  * @author dongwei
  * @since 2020/09/14
  * Time: 15:26
- * BIO实现
+ * BIO channel 实现
  */
 public class BioChannel implements Channel {
 
@@ -43,6 +44,7 @@ public class BioChannel implements Channel {
 
     @Override
     public Channel write(Payload message) throws IOException {
+        // 请求消息
         if(message instanceof SimpleRequestPayload){
             SimpleRequestPayload requestPayload = (SimpleRequestPayload)message;
             // 标识位 分为低位和高位
@@ -53,17 +55,39 @@ public class BioChannel implements Channel {
             // 请求响应状态
             getOutputStream().write(0x00);
             // invoke id long类型，需要处理一下
-            getOutputStream().write(requestPayload.bytes());
+            IoUtil.writeLong(getOutputStream(),requestPayload.invokeId());
             // 消息体 body的长度，int类型  也需要处理一下
             int bodySize = requestPayload.bytes().length;
             IoUtil.writeInt(getOutputStream(),bodySize);
             // 消息体
             getOutputStream().write(requestPayload.bytes());
-
         }else if(message instanceof SimpleResponsePayload){
+            // 响应消息
+            SimpleResponsePayload responsePayload = (SimpleResponsePayload)message;
+            // 标识位 分为低位和高位
+            byte low = PayloadHeader.REQUEST;
+            byte high = responsePayload.serializerCode();
+            byte sign = PayloadHeader.toSign(high, low);
+            getOutputStream().write(sign);
+            byte status = responsePayload.status();
+            getOutputStream().write(status);
+            IoUtil.writeLong(getOutputStream(),responsePayload.id());
+            byte[] bytes = responsePayload.bytes();
+            int length = bytes.length;
+            IoUtil.writeInt(getOutputStream(),length);
+            getOutputStream().write(bytes);
 
+        }else if(message instanceof HeartBeats){
+            // 心跳包 只有头信息，其他的都给空就好了 这里只做一个标志
+            HeartBeats heartBeats = (HeartBeats)message;
+            byte low = PayloadHeader.HEARTBEAT;
+            // 不用区分高位地位了
+            getOutputStream().write(low);
+            getOutputStream().write(0);
+            IoUtil.writeLong(getOutputStream(),0);
+            IoUtil.writeInt(getOutputStream(),0);
         }
-        return null;
+        return this;
     }
 
     private OutputStream getOutputStream() throws IOException {
@@ -81,5 +105,10 @@ public class BioChannel implements Channel {
             }
         }
         return channel;
+    }
+
+    @Override
+    public String toString() {
+        return "id->" + id + " remote address->"+socket.getInetAddress()+ "  port:" + socket.getPort();
     }
 }

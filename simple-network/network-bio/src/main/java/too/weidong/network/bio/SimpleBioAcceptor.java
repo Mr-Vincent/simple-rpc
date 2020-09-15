@@ -1,17 +1,21 @@
 package too.weidong.network.bio;
 
 import com.google.common.collect.Lists;
+import top.weidong.common.util.ListenableArrayList;
 import top.weidong.common.util.NamedThreadFactory;
 import top.weidong.network.api.Acceptor;
 import top.weidong.network.api.Channel;
 import top.weidong.network.api.ProviderProcessor;
+import top.weidong.network.api.ServerSocketFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dongwei
@@ -22,28 +26,33 @@ import java.util.concurrent.*;
 public class SimpleBioAcceptor implements Acceptor {
 
     private ServerSocket serverSocket;
+
+    private ServerSocketFactory ssf;
+
+    private boolean running;
     /**
      * 绑定的端口号
      */
     private Integer port;
 
-    private List<Channel> allChannels = Lists.newArrayList();
+    private ListenableArrayList<Channel> allChannels = new ListenableArrayList<>();
 
     private static final Integer DEFAULT_PORT = 9999;
 
-    private ExecutorService executor = new ThreadPoolExecutor(4,4,0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(100),new NamedThreadFactory("Acceptor"));
+    private ExecutorService executor = new ThreadPoolExecutor(1,1,0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),new NamedThreadFactory("Acceptor"));
 
     private ProviderProcessor providerProcessor;
 
     public SimpleBioAcceptor(Integer port) throws IOException {
         this.port = port;
-        serverSocket = new ServerSocket();
+        ssf = new DefaultServerSocketFactory();
     }
     @Override
     public void start() throws IOException {
-        serverSocket.bind(new InetSocketAddress(this.port),128);
-        executor.execute(new AcceptorTask(serverSocket));
+        running = true;
+        serverSocket = ssf.createSocket(this.port, 128);
+        executor.execute(new AcceptorTask());
     }
 
     @Override
@@ -66,17 +75,24 @@ public class SimpleBioAcceptor implements Acceptor {
     }
 
     class AcceptorTask implements Runnable{
-        ServerSocket serverSocket;
-        public AcceptorTask(ServerSocket serverSocket){
-            this.serverSocket = serverSocket;
+        public AcceptorTask(){
         }
         @Override
         public void run() {
-            while (true){
+            while (running){
                 try {
-                    Socket socket = serverSocket.accept();
-                    System.out.println(Thread.currentThread().getName());
-                    allChannels.add(BioChannel.ofChannel(socket));
+                    Socket socket = ssf.acceptSocket(serverSocket);
+                    allChannels.add(BioChannel.ofChannel(socket),new ListenableArrayList.ElementAddListener<Channel>(){
+                        @Override
+                        public void success(Channel o) {
+                            System.out.println("add success: " + o.toString());
+                        }
+                        @Override
+                        public void fail(Channel o, Throwable throwable) {
+                            System.out.println("add fail");
+                            throwable.printStackTrace();
+                        }
+                    });
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

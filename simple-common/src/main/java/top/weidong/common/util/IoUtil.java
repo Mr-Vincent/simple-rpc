@@ -170,6 +170,31 @@ public abstract class IoUtil {
     }
 
     /**
+     * 向流中写long字节
+     * @param outputStream
+     * @param longValue
+     * @throws IOException
+     */
+    public static void writeLong(OutputStream outputStream, long longValue) throws IOException {
+        byte b0 = (byte) (longValue >>> 56);
+        byte b1 = (byte) (longValue >>> 48);
+        byte b2 = (byte) (longValue >>> 40);
+        byte b3 = (byte) (longValue >>> 32);
+        byte b4 = (byte) (longValue >>> 24);
+        byte b5 = (byte) (longValue >>> 16);
+        byte b6 = (byte) (longValue >>> 8);
+        byte b7 = (byte) longValue;
+        outputStream.write(b0);
+        outputStream.write(b1);
+        outputStream.write(b2);
+        outputStream.write(b3);
+        outputStream.write(b4);
+        outputStream.write(b5);
+        outputStream.write(b6);
+        outputStream.write(b7);
+    }
+
+    /**
      * 在流中读要读取的字节长度
      * @param inputStream
      * @return

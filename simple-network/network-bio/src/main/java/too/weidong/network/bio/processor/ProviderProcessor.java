@@ -1,7 +1,7 @@
 package too.weidong.network.bio.processor;
 
 import too.weidong.network.bio.Status;
-import too.weidong.network.bio.payload.SRequestPayload;
+import too.weidong.network.bio.payload.SimpleRequestPayload;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,12 +15,12 @@ public interface ProviderProcessor {
     /**
      * 处理正常请求
      */
-    void handleRequest(SRequestPayload request) throws Exception;
+    void handleRequest(SimpleRequestPayload request) throws Exception;
 
     /**
      * 处理异常
      */
-    void handleException(SRequestPayload request, Status status, Throwable cause);
+    void handleException(SimpleRequestPayload request, Status status, Throwable cause);
 
     void shutdown();
 }
