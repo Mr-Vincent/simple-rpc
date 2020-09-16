@@ -38,7 +38,7 @@
         <protostuff.version>1.5.2</protostuff.version>
         <kryo.version>2.23.0</kryo.version>
         <objenesis.version>2.1</objenesis.version>
-        <zookeeper.version>3.4.8</zookeeper.version>
+        <zookeeper.version>3.4.14</zookeeper.version>
         <curator.version>4.2.0</curator.version>
         <javaassit.version>3.20.0-GA</javaassit.version>
         <cglib.version>3.2.2</cglib.version>
