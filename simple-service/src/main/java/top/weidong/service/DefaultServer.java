@@ -1,11 +1,10 @@
 package top.weidong.service;
 
+import too.weidong.network.bio.SServer;
+import too.weidong.network.bio.processor.Processor;
 import top.weidong.common.util.NetUtil;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
-import network.SServer;
-import network.enums.ProcessorType;
-import too.weidong.network.bio.processor.Processor;
 import top.weidong.registry.RegisterMeta;
 import top.weidong.registry.RegistryService;
 import top.weidong.service.processor.ProcessorFactory;
@@ -28,7 +27,6 @@ public class DefaultServer {
 
     private SServer server;
 
-    private ProcessorType type;
 
     private RegistryService registryService;
 
@@ -48,10 +46,6 @@ public class DefaultServer {
         this.serverAddress = resolveToAddress(exposePort);
     }
 
-    public DefaultServer(ProcessorType type, RegistryService registryService) {
-        this.registryService = registryService;
-        this.type = type;
-    }
 
     /**
      * 构造本机暴露的服务地址--> ip ： port
@@ -69,12 +63,7 @@ public class DefaultServer {
      * @return
      */
     public DefaultServer withServer(SServer server) {
-        Processor processor = null;
-        if (null == type) {
-            processor = ProcessorFactory.newInstance(ProcessorType.RPC,handlerMap);
-        } else {
-            processor = ProcessorFactory.newInstance(type,handlerMap);
-        }
+        Processor processor = ProcessorFactory.newInstance(handlerMap);
         LOGGER.debug(">>>>>>>>>>>add processor>>>>>>>>>>>：[{}]", processor.getClass().getName());
         if (server.getProcessor() == null) {
             server.withProcessor(processor);

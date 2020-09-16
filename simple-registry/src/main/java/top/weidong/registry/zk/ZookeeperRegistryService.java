@@ -12,9 +12,9 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import too.weidong.network.bio.Directory;
 import top.weidong.common.util.internal.logging.InternalLogger;
 import top.weidong.common.util.internal.logging.InternalLoggerFactory;
-import network.Directory;
 import top.weidong.registry.Registry;
 import top.weidong.registry.RegistryService;
 
@@ -33,7 +33,7 @@ public class ZookeeperRegistryService implements Registry,RegistryService {
 
     private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(ZookeeperRegistryService.class);
     /**目录*/
-    private static final String PROVIDER_PATH = "/simple/provider";
+    private static final String PROVIDER_PATH = "/simple_rpc/provider";
 
     private CuratorFramework client;
 
@@ -94,7 +94,7 @@ public class ZookeeperRegistryService implements Registry,RegistryService {
     }
 
     /**
-     * 订阅一个服务
+     * 订阅一个服务 即 通过目录名（服务接口名）去找注册中心上的服务提供者的地址
      * @param meta
      */
     @Override

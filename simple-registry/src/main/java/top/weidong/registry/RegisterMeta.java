@@ -1,6 +1,7 @@
 package top.weidong.registry;
 
-import network.Directory;
+
+import too.weidong.network.bio.Directory;
 
 /**
  * Created with IntelliJ IDEA.

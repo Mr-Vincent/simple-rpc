@@ -1,8 +1,9 @@
 package too.weidong.network.bio;
 
-import com.google.common.collect.Lists;
 import top.weidong.common.util.ListenableArrayList;
 import top.weidong.common.util.NamedThreadFactory;
+import top.weidong.common.util.internal.logging.InternalLogger;
+import top.weidong.common.util.internal.logging.InternalLoggerFactory;
 import top.weidong.network.api.Acceptor;
 import top.weidong.network.api.Channel;
 import top.weidong.network.api.ProviderProcessor;
@@ -24,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  * BIO实现
  */
 public class SimpleBioAcceptor implements Acceptor {
+
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SimpleBioAcceptor.class);
 
     private ServerSocket serverSocket;
 
@@ -85,16 +88,15 @@ public class SimpleBioAcceptor implements Acceptor {
                     allChannels.add(BioChannel.ofChannel(socket),new ListenableArrayList.ElementAddListener<Channel>(){
                         @Override
                         public void success(Channel o) {
-                            System.out.println("add success: " + o.toString());
+                            logger.info("channel has established success :{}", o.toString());
                         }
                         @Override
                         public void fail(Channel o, Throwable throwable) {
-                            System.out.println("add fail");
-                            throwable.printStackTrace();
+                            logger.error("channel was establishing with error:{}", throwable.getMessage(), throwable);
                         }
                     });
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("acceptor was initialing in trouble:{}", e.getMessage(), e);
                 }
             }
         }
